@@ -34,7 +34,7 @@ fun ScreenBaseThree(navController: NavController? = null) {
             modifier = Modifier
                 .wrapContentWidth()
                 .padding(16.dp)
-                .clickable { navController?.navigate(Navs.Row.screenRoute + "/xxx?startScreen=three") }
+                .clickable { navController?.navigate(Navs.Col.screenRoute + "/xxx?startScreen=three") }
                 .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(16.dp))
                 .padding(16.dp),
             text = "ScreenBaseThree",

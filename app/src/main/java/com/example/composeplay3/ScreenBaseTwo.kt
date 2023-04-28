@@ -34,7 +34,7 @@ fun ScreenBaseTwo(navController: NavController? = null) {
             modifier = Modifier
                 .wrapContentWidth()
                 .padding(16.dp)
-                .clickable { navController?.navigate(Navs.Constraint.screenRoute + "/xxx?startScreen=two") }
+                .clickable { navController?.navigate(Navs.Row.screenRoute + "/xxx?startScreen=two") }
                 .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(16.dp))
                 .padding(16.dp),
             text = "ScreenBaseTwo",

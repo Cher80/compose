@@ -36,13 +36,16 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.example.composeplay3.ui.theme.ComposePlay3Theme
 
@@ -51,9 +54,9 @@ class MainActivity : ComponentActivity() {
 
     companion object {
         val items = listOf(
-            Navs.BaseOne,
-            Navs.BaseTwo,
-            Navs.BaseThree
+            Navs.GraphOne,
+            Navs.GraphTwo,
+            Navs.GraphThree
         )
     }
 
@@ -64,6 +67,38 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             MainContent(navController = navController, items = items)
         }
+    }
+}
+
+
+fun NavGraphBuilder.globalNavigationDestinations(navController: NavController) {
+    composable(route = "${Navs.Box.screenRoute}/{userId}?startScreen={startScreen}") { backStackEntry ->
+        ScreenBox(
+            userId = backStackEntry.arguments?.getString("userId") ?: "",
+            startScreen = backStackEntry.arguments?.getString("startScreen") ?: "",
+            navController = navController
+        )
+    }
+    composable(route = "${Navs.Constraint.screenRoute}/{userId}?startScreen={startScreen}") { backStackEntry ->
+        ScreenConstraint(
+            userId = backStackEntry.arguments?.getString("userId") ?: "",
+            startScreen = backStackEntry.arguments?.getString("startScreen") ?: "",
+            navController = navController
+        )
+    }
+    composable(route = "${Navs.Row.screenRoute}/{userId}?startScreen={startScreen}") { backStackEntry ->
+        ScreenRow(
+            userId = backStackEntry.arguments?.getString("userId") ?: "",
+            startScreen = backStackEntry.arguments?.getString("startScreen") ?: "",
+            navController = navController
+        )
+    }
+    composable(route = "${Navs.Col.screenRoute}/{userId}?startScreen={startScreen}") { backStackEntry ->
+        ScreenColumn(
+            userId = backStackEntry.arguments?.getString("userId") ?: "",
+            startScreen = backStackEntry.arguments?.getString("startScreen") ?: "",
+            navController = navController
+        )
     }
 }
 
@@ -80,51 +115,47 @@ fun MainContent(navController: NavHostController, items: List<Navs>) {
         ) {
             NavHost(
                 modifier = Modifier.padding(top = 56.dp, bottom = 56.dp),
-                navController = navController, startDestination = Navs.BaseOne.screenRoute
+                navController = navController, startDestination = Navs.GraphOne.screenRoute
             ) {
-                composable(route = "${Navs.Box.screenRoute}/{userId}?startScreen={startScreen}") { backStackEntry ->
-                    ScreenBox(
-                        userId = backStackEntry.arguments?.getString("userId") ?: "",
-                        startScreen = backStackEntry.arguments?.getString("startScreen") ?: "",
-                        navController = navController
-                    )
+
+                navigation(
+                    route = Navs.GraphOne.screenRoute,
+                    startDestination = Navs.BaseOne.screenRoute
+                ) {
+                    composable(route = Navs.BaseOne.screenRoute) {
+                        ScreenBaseOne(
+                            navController = navController
+                        )
+                    }
+                    globalNavigationDestinations(navController)
                 }
-                composable(route = "${Navs.Constraint.screenRoute}/{userId}?startScreen={startScreen}") {backStackEntry ->
-                    ScreenConstraint(
-                        userId = backStackEntry.arguments?.getString("userId") ?: "",
-                        startScreen = backStackEntry.arguments?.getString("startScreen") ?: "",
-                        navController = navController
-                    )
+
+
+                navigation(
+                    route = Navs.GraphTwo.screenRoute,
+                    startDestination = Navs.BaseTwo.screenRoute
+                ) {
+                    composable(route = Navs.BaseTwo.screenRoute) {
+                        ScreenBaseTwo(
+                            navController = navController
+                        )
+                    }
+                    globalNavigationDestinations(navController)
                 }
-                composable(route = "${Navs.Row.screenRoute}/{userId}?startScreen={startScreen}") {backStackEntry ->
-                    ScreenRow(
-                        userId = backStackEntry.arguments?.getString("userId") ?: "",
-                        startScreen = backStackEntry.arguments?.getString("startScreen") ?: "",
-                        navController = navController
-                    )
+
+
+                navigation(
+                    route = Navs.GraphThree.screenRoute,
+                    startDestination = Navs.BaseThree.screenRoute
+                ) {
+                    composable(route = Navs.BaseThree.screenRoute) {
+                        ScreenBaseThree(
+                            navController = navController
+                        )
+                    }
+                    globalNavigationDestinations(navController)
                 }
-                composable(route = "${Navs.Col.screenRoute}/{userId}?startScreen={startScreen}") {backStackEntry ->
-                    ScreenColumn(
-                        userId = backStackEntry.arguments?.getString("userId") ?: "",
-                        startScreen = backStackEntry.arguments?.getString("startScreen") ?: "",
-                        navController = navController
-                    )
-                }
-                composable(route = Navs.BaseOne.screenRoute) {
-                    ScreenBaseOne(
-                        navController = navController
-                    )
-                }
-                composable(route = Navs.BaseTwo.screenRoute) {
-                    ScreenBaseTwo(
-                        navController = navController
-                    )
-                }
-                composable(route = Navs.BaseThree.screenRoute) {
-                    ScreenBaseThree(
-                        navController = navController
-                    )
-                }
+
             }
 
             TopAppBar(
@@ -152,13 +183,32 @@ fun MainContent(navController: NavHostController, items: List<Navs>) {
                 val currentDestination = navBackStackEntry?.destination
 
 
+
                 Log.d("sads", "currentDestination = ${currentDestination?.route}")
                 val hierarchy = currentDestination?.hierarchy
+
+
+                for (navGraphDestination in navController.graph) {
+                    Log.d("sads", "navGraphDestination = ${navGraphDestination?.route}")
+
+                }
+
                 if (hierarchy != null) {
                     for (dest in hierarchy) {
-                        Log.d("sads", "dest = ${dest?.route}")
+                        Log.d("sads", "hierarchy dest = ${dest?.route}")
                     }
                 }
+
+
+                for (navBackStackEntryBack in navController.backQueue) {
+                    val startScreen = navBackStackEntryBack.arguments?.getString("startScreen")
+                    val simpleClass = navBackStackEntryBack.destination::class.java.simpleName
+                    Log.d(
+                        "sads",
+                        "navBackStackEntryBack.destination=${navBackStackEntryBack.destination.route} simpleClass=$simpleClass  startScreen=$startScreen"
+                    )
+                }
+
 //                while (currentDestination?.hierarchy?.iterator()?.hasNext() == true) {
 //                    val dest = currentDestination?.hierarchy?.iterator()?.next()
 //
@@ -187,69 +237,75 @@ fun MainContent(navController: NavHostController, items: List<Navs>) {
 
                 items.forEachIndexed { index, navs ->
 
-                    var selected = false
-                    if (navs.screenRoute == navController.graph.findStartDestination().route) {
-                        val nonFirstTabsRoutes = items.subList(1, items.size).map {
-                            it.screenRoute
-                        }
-                        selected = navController.backQueue.none {
-                            nonFirstTabsRoutes.contains(it.destination.route)
-                        }
-                    } else {
-                        selected = navController.backQueue.any {
-                            it.destination.route == navs.screenRoute
-                        }
-                    }
+//                    var selected = false
+//                    if (navs.screenRoute == navController.graph.findStartDestination().route) {
+//                        val nonFirstTabsRoutes = items.subList(1, items.size).map {
+//                            it.screenRoute
+//                        }
+//                        selected = navController.backQueue.none {
+//                            nonFirstTabsRoutes.contains(it.destination.route)
+//                        }
+//                    } else {
+//                        selected = navController.backQueue.any {
+//                            it.destination.route == navs.screenRoute
+//                        }
+//                    }
+
+                    Log.d(
+                        "sads",
+                        "navController.graph.findStartDestination()=${navController.graph.findStartDestination().route} navController.graph=${navController.graph} navController.graph.startDestinationRoute=${navController.graph.startDestinationRoute}"
+                    )
 
                     BottomNavigationItem(
                         icon = { Icon(painterResource(id = navs.icon), null) },
                         label = { Text(text = navs.title) },
                         //selected = currentDestination?.route == navs.screenRoute,
-                        //selected = currentDestination?.hierarchy?.any { it.route == navs.screenRoute } == true,
-                        selected = selected,
+                        selected = currentDestination?.hierarchy?.any { it.route == navs.screenRoute } == true,
+//                        selected = selected,
                         selectedContentColor = Color.Red,
                         unselectedContentColor = Color.Black,
                         onClick = {
 
-                            var currentTab: NavDestination? = null
-
-                            val nonFirstTabsDestinations = items.subList(1, items.size)
-
-//                            nonFirstTabsDestinations.firstOrNull {navsInner ->
-//                                navController.backQueue.any {  }() { it.destination.route == navsInner.screenRoute})?.destination
+//                            var currentTab: NavDestination? = null
+//
+//                            val nonFirstTabsDestinations = items.subList(1, items.size)
+//
+//                            nonFirstTabsDestinations.forEach { navsInner ->
+//                                if (currentTab == null) {
+//                                    currentTab =
+//                                        (navController.backQueue.firstOrNull() { it.destination.route == navsInner.screenRoute })?.destination
+//                                }
 //                            }
-
-                            nonFirstTabsDestinations.forEach { navsInner ->
-                                if (currentTab == null) {
-                                    currentTab =
-                                        (navController.backQueue.firstOrNull() { it.destination.route == navsInner.screenRoute })?.destination
-                                }
-                            }
-
-                            if (currentTab == null) {
-                                currentTab = navController.graph.findStartDestination()
-                            }
-
-
-                            navController.backQueue.forEach {
-                                Log.d("sads", "it = $it")
-                            }
+//
+//                            if (currentTab == null) {
+//                                currentTab = navController.graph.findStartDestination()
+//                            }
+//
+//
+//                            navController.backQueue.forEach {
+//                                Log.d("sads", "it = $it")
+//                            }
 
                             navController.navigate(navs.screenRoute) {
                                 // Pop up to the start destination of the graph to
                                 // avoid building up a large stack of destinations
                                 // on the back stack as users select items
 
-                                popUpTo(currentTab!!.id) {
+//                                popUpTo(currentTab!!.id) {
+//                                    saveState = true
+//                                    inclusive = true
+//                                }
+
+
+                                popUpTo(navController.graph.findStartDestination().id) {
                                     saveState = true
-                                    inclusive = true
+                                }
+
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
                                 }
 
 
-//                                popUpTo(navController.graph.findStartDestination().id) {
-//                                    saveState = true
-//                                    //inclusive = true
-//                                }
                                 // Avoid multiple copies of the same destination when
                                 // reselecting the same item
                                 launchSingleTop = true
@@ -302,10 +358,8 @@ fun Greeting(name1: String, name2: String) {
                 color = Color.Red
             )
         )
-
         ScreenConstraint("Android", "ios")
     }
-
 }
 
 @Preview(showBackground = true)
