@@ -1,4 +1,4 @@
-package com.example.composeplay3
+package com.example.composeplay3.ftabs
 
 sealed class Navs(var title: String, var icon: Int, var screenRoute: String) {
 
@@ -43,6 +43,13 @@ sealed class Navs(var title: String, var icon: Int, var screenRoute: String) {
         title = "Col",
         icon = androidx.core.R.drawable.ic_call_answer_video,
         screenRoute = "screenCol"
+    )
+
+
+    object SheetOne : Navs(
+        title = "SheetOne",
+        icon = androidx.core.R.drawable.ic_call_answer_video,
+        screenRoute = "sheetOne"
     )
 }
 

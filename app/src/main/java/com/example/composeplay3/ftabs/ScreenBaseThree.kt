@@ -1,4 +1,4 @@
-package com.example.composeplay3
+package com.example.composeplay3.ftabs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,22 +22,22 @@ import com.example.composeplay3.ui.theme.ComposePlay3Theme
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun ScreenBaseOne(navController: NavController? = null) {
+fun ScreenBaseThree(navController: NavController? = null) {
     Box(
         modifier = Modifier
             .padding(16.dp)
             .fillMaxSize()
-            .background(Color(0xFF00B7FF), RoundedCornerShape(16.dp))
+            .background(Color(0xFF0037FF), RoundedCornerShape(16.dp))
     ) {
 
         Text(
             modifier = Modifier
                 .wrapContentWidth()
                 .padding(16.dp)
-                .clickable { navController?.navigate(Navs.Box.screenRoute + "/xxx?startScreen=one") }
+                .clickable { navController?.navigate(Navs.Row.screenRoute + "/xxx?startScreen=three") }
                 .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(16.dp))
                 .padding(16.dp),
-            text = "BaseOne",
+            text = "ScreenBaseThree",
             style = TextStyle(
                 color = Color.Red
             )
@@ -48,8 +48,8 @@ fun ScreenBaseOne(navController: NavController? = null) {
 
 @Preview(showBackground = true)
 @Composable
-fun ScreenBaseOnePreview() {
+fun ScreenBaseThreePreview() {
     ComposePlay3Theme {
-        ScreenBaseOne()
+        ScreenBaseThree()
     }
 }

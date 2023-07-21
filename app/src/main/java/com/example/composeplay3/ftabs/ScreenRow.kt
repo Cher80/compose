@@ -1,10 +1,8 @@
-package com.example.composeplay3
+package com.example.composeplay3.ftabs
 
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -20,15 +18,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import com.example.composeplay3.ui.theme.ComposePlay3Theme
 
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun ScreenColumn(userId: String, startScreen: String, navController: NavController? = null) {
-    Column(
+fun ScreenRow(userId: String, startScreen: String, navController: NavController? = null) {
+    Row(
         modifier = Modifier
             .padding(16.dp)
             .fillMaxSize()
@@ -41,20 +38,16 @@ fun ScreenColumn(userId: String, startScreen: String, navController: NavControll
 
         Text(
             modifier = Modifier
-                .wrapContentWidth()
-                .padding(16.dp)
-                .padding(16.dp),
-            text = "A'm Col $startScreen $userId",
+                .wrapContentWidth(),
+            text = "Row $startScreen $userId",
             style = TextStyle(
                 color = Color.Black
             )
         )
 
-
         Text(
             modifier = Modifier
                 .wrapContentWidth()
-                .padding(16.dp)
                 .clickable { navController?.navigate(Navs.Box.screenRoute + "/xxx?startScreen=" + startScreen) }
                 .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(16.dp))
                 .padding(16.dp),
@@ -67,7 +60,6 @@ fun ScreenColumn(userId: String, startScreen: String, navController: NavControll
         Text(
             modifier = Modifier
                 .wrapContentWidth()
-                .padding(16.dp)
                 .clickable { navController?.navigate(Navs.Constraint.screenRoute + "/xxx?startScreen=" + startScreen) }
                 .background(MaterialTheme.colorScheme.secondary, RoundedCornerShape(16.dp))
                 .padding(16.dp),
@@ -80,7 +72,6 @@ fun ScreenColumn(userId: String, startScreen: String, navController: NavControll
         Text(
             modifier = Modifier
                 .wrapContentWidth()
-                .padding(16.dp)
                 .clickable { navController?.navigate(Navs.Row.screenRoute + "/xxx?startScreen=" + startScreen) }
                 .background(MaterialTheme.colorScheme.secondary, RoundedCornerShape(16.dp))
                 .padding(16.dp),
@@ -90,11 +81,9 @@ fun ScreenColumn(userId: String, startScreen: String, navController: NavControll
             )
         )
 
-
         Text(
             modifier = Modifier
                 .wrapContentWidth()
-                .padding(16.dp)
                 .clickable { navController?.navigate(Navs.Col.screenRoute + "/xxx?startScreen=" + startScreen) }
                 .background(MaterialTheme.colorScheme.secondary, RoundedCornerShape(16.dp))
                 .padding(16.dp),
@@ -109,7 +98,7 @@ fun ScreenColumn(userId: String, startScreen: String, navController: NavControll
 
 @Preview(showBackground = true)
 @Composable
-fun ScreenColumnPreview() {
+fun ScreenRowPreview() {
     ComposePlay3Theme {
         ScreenConstraint("Android", "ios")
     }

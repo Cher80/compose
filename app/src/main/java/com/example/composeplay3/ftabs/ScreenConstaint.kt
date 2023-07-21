@@ -1,9 +1,8 @@
-package com.example.composeplay3
+package com.example.composeplay3.ftabs
 
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -11,41 +10,55 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import com.example.composeplay3.ui.theme.ComposePlay3Theme
 
 
 @Composable
-fun ScreenBox(userId: String, startScreen: String, navController: NavController? = null) {
-    Box(
+fun ScreenConstraint(userId: String, startScreen: String, navController: NavController? = null) {
+    ConstraintLayout(
         modifier = Modifier
             .padding(16.dp)
             .fillMaxSize()
-            .background(Color(0xFF9AD690), RoundedCornerShape(16.dp))
+            .background(Color(0xff00ffFF), RoundedCornerShape(16.dp))
     ) {
+        val composables = createRefs()
+        val s1 = composables.component1()
+        val s2 = composables.component2()
+        val s3 = composables.component3()
+        val s4 = composables.component4()
+        val s5 = composables.component5()
+        Log.d("dgty", "s1=$s1 s2=$s2")
+
 
         Text(
             modifier = Modifier
                 .wrapContentWidth()
-                .align(Alignment.TopCenter)
-                .padding(16.dp)
+                .constrainAs(s5) {
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }
                 .padding(16.dp),
-            text = "A'm Box $startScreen $userId",
+            text = "I'm Constraint $startScreen $userId",
             style = TextStyle(
-                color = Color.Black
+                color = Color.Red
             )
         )
 
         Text(
             modifier = Modifier
                 .wrapContentWidth()
-                .align(Alignment.TopStart)
+                .constrainAs(s1) {
+
+                }
                 .padding(16.dp)
                 .clickable {
                     ii++
@@ -62,7 +75,9 @@ fun ScreenBox(userId: String, startScreen: String, navController: NavController?
         Text(
             modifier = Modifier
                 .wrapContentWidth()
-                .align(Alignment.TopEnd)
+                .constrainAs(s2) {
+                    start.linkTo(s1.end)
+                }
                 .padding(16.dp)
                 .clickable {
                     ii++
@@ -70,7 +85,7 @@ fun ScreenBox(userId: String, startScreen: String, navController: NavController?
                 }
                 .background(MaterialTheme.colorScheme.secondary, RoundedCornerShape(16.dp))
                 .padding(16.dp),
-            text = "cons",
+            text = "Cons",
             style = TextStyle(
                 color = Color.Black
             )
@@ -79,7 +94,9 @@ fun ScreenBox(userId: String, startScreen: String, navController: NavController?
         Text(
             modifier = Modifier
                 .wrapContentWidth()
-                .align(Alignment.CenterStart)
+                .constrainAs(s3) {
+                    top.linkTo(s1.bottom)
+                }
                 .padding(16.dp)
                 .clickable {
                     ii++
@@ -87,7 +104,7 @@ fun ScreenBox(userId: String, startScreen: String, navController: NavController?
                 }
                 .background(MaterialTheme.colorScheme.secondary, RoundedCornerShape(16.dp))
                 .padding(16.dp),
-            text = "row",
+            text = "Row",
             style = TextStyle(
                 color = Color.Black
             )
@@ -96,7 +113,10 @@ fun ScreenBox(userId: String, startScreen: String, navController: NavController?
         Text(
             modifier = Modifier
                 .wrapContentWidth()
-                .align(Alignment.CenterEnd)
+                .constrainAs(s4) {
+                    start.linkTo(s3.end)
+                    top.linkTo(s3.top)
+                }
                 .padding(16.dp)
                 .clickable {
                     ii++
@@ -104,7 +124,7 @@ fun ScreenBox(userId: String, startScreen: String, navController: NavController?
                 }
                 .background(MaterialTheme.colorScheme.secondary, RoundedCornerShape(16.dp))
                 .padding(16.dp),
-            text = "col",
+            text = "Col",
             style = TextStyle(
                 color = Color.Black
             )
@@ -115,8 +135,8 @@ fun ScreenBox(userId: String, startScreen: String, navController: NavController?
 
 @Preview(showBackground = true)
 @Composable
-fun ScreenBoxPreview() {
+fun ScreenConstraintPreview() {
     ComposePlay3Theme {
-        ScreenBox("Android", "ios")
+        ScreenConstraint("Android", "ios")
     }
 }
