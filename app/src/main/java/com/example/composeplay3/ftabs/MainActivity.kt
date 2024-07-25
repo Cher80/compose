@@ -1,5 +1,6 @@
 package com.example.composeplay3.ftabs
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -37,6 +38,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -90,6 +92,7 @@ class MainActivity : ComponentActivity() {
 }
 
 
+@SuppressLint("RestrictedApi")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun MainContent(
@@ -128,6 +131,7 @@ fun MainContent(
                 ) {
                     composable(route = "${Navs.Box.screenRoute}/{userId}?startScreen={startScreen}") { backStackEntry ->
                         ScreenBox(
+                            //viewModel = viewModel(modelClass = ScreenBoxViewModel::class.java),
                             userId = backStackEntry.arguments?.getString("userId") ?: "",
                             startScreen = backStackEntry.arguments?.getString("startScreen") ?: "",
                             navController = navController
@@ -217,7 +221,7 @@ fun MainContent(
                         }
                     }
 
-                    for (navBack in navController.backQueue) {
+                    for (navBack in navController.currentBackStack.value) {
                         Log.d("sads", "navBack = ${navBack.destination.route}")
                     }
 
@@ -237,9 +241,11 @@ fun MainContent(
 
                     items.forEachIndexed { index, nav ->
 
-                        val selected = navController.backQueue.any {
+                        val selected = navController.currentBackStack.value.any {
                             it.destination.route == nav.screenRoute
                         }
+
+//                        val selected = false
 
                         BottomNavigationItem(
                             icon = { Icon(painterResource(id = nav.icon), null) },
@@ -264,9 +270,11 @@ fun MainContent(
 }
 
 
+@SuppressLint("RestrictedApi")
 fun bottomNavigatonClick(navController: NavController, nav: Navs) {
-    val currentBaseTab: NavDestination = navController.backQueue[1].destination
+//    val currentBaseTab: NavDestination = navController.backQueue[1].destination
 
+    val currentBaseTab = navController.currentBackStack.value[1].destination
     navController.navigate(nav.screenRoute) {
         // Pop up to the start destination of the graph to
         // avoid building up a large stack of destinations

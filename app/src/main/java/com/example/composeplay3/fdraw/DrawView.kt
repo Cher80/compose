@@ -28,9 +28,6 @@ import kotlinx.coroutines.delay
 @Composable
 fun DrawView(modifier: Modifier) {
 
-//    val tick = remember {
-//        mutableStateOf<Long>(0L)
-//    }
 
     val angle = remember {
         Animatable(0f)
@@ -46,21 +43,6 @@ fun DrawView(modifier: Modifier) {
                 repeatMode = RepeatMode.Reverse
             )
         )
-//        while (true) {
-//            //in-order to get smooth transition we are updating rotation angle every 16ms
-//            //1000ms -> 6 degree
-//            //16ms -> 0.096
-//            //delay(160)
-//
-//            //tick.value = tick.value + 1
-//            angle.animateTo(
-//                1f,
-//                animationSpec = infiniteRepeatable(
-//                    animation = tween(700, easing =  FastOutSlowInEasing),
-//                    repeatMode = RepeatMode.Reverse
-//                )
-//            )
-//        }
     }
 
 
@@ -132,16 +114,6 @@ fun DrawView(modifier: Modifier) {
             )
         }
     }
-
-//    Text(
-//        modifier = Modifier
-//            .wrapContentWidth().wrapContentHeight(),
-//        maxLines = 5,
-//        text = "tick = ${tick.value}",
-//        style = TextStyle(
-//            color = Color(0xFFFFFFFF)
-//        )
-//    )
 }
 
 @Preview(showBackground = true)

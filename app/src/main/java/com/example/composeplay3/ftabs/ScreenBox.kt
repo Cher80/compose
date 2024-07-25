@@ -1,5 +1,6 @@
 package com.example.composeplay3.ftabs
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -21,7 +22,9 @@ import com.example.composeplay3.ui.theme.ComposePlay3Theme
 
 
 @Composable
-fun ScreenBox(userId: String, startScreen: String, navController: NavController? = null) {
+fun ScreenBox(
+    userId: String, startScreen: String, navController: NavController? = null) {
+    Log.d("mmeme", "ScreenBox userId=$userId")
     Box(
         modifier = Modifier
             .padding(16.dp)

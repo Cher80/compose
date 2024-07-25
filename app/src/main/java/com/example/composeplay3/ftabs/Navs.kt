@@ -11,13 +11,13 @@ sealed class Navs(var title: String, var icon: Int, var screenRoute: String) {
 
     object BaseTwo : Navs(
         title = "BaseTwo",
-        icon = androidx.core.R.drawable.ic_call_answer,
+        icon = androidx.core.R.drawable.ic_call_decline,
         screenRoute = "screenBaseTwo"
     )
 
     object BaseThree : Navs(
         title = "BaseThree",
-        icon = androidx.core.R.drawable.ic_call_answer,
+        icon = androidx.core.R.drawable.ic_call_answer_video_low,
         screenRoute = "screenBaseThree"
     )
 
