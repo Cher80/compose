@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -21,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import com.example.composeplay3.ui.theme.ComposePlay3Theme
 
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun BannerView2(state: BannerState, modifier: Modifier) {
 

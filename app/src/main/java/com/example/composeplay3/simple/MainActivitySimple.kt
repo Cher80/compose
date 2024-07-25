@@ -6,21 +6,17 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
-import com.example.composeplay3.fbannerwidth.MainContentsState2
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeout
 
 class MainActivitySimple : ComponentActivity() {
 
@@ -49,20 +45,27 @@ class MainActivitySimple : ComponentActivity() {
 
 
         setContent {
-            val simpleDataMutable: MutableState<SimpleData?> =
+            val simpleDataMutable: MutableState<SimpleData?> = remember {
                 mutableStateOf(null)
-            val simpleDataMutable2: MutableState<SimpleData?> =
-                mutableStateOf(null)
+            }
 
-            lifecycleScope.launch {
-                myState.collect { simpleData ->
-                    Log.d("gcompose", "collect $simpleData")
-                    simpleDataMutable.value = simpleData
-                    simpleDataMutable2.value = SimpleData(
-                        name = "dd",
-                        count = 2
-                    )
+            val simpleDataMutable2: MutableState<SimpleData?> = remember {
+                mutableStateOf(null)
+            }
+
+
+            LaunchedEffect(key1 = "dd") {
+                lifecycleScope.launch {
+                    myState.collect { simpleData ->
+                        Log.d("gcompose", "collect $simpleData")
+                        simpleDataMutable.value = simpleData
+                        simpleDataMutable2.value = SimpleData(
+                            name = "dd",
+                            count = 2
+                        )
+                    }
                 }
+
             }
 
             SelfUpdateContent(
@@ -73,7 +76,6 @@ class MainActivitySimple : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun SelfUpdateContent(simpleData: SimpleData?, simpleData2: SimpleData?) {
     Log.d("gcompose", "SelfUpdateContent")

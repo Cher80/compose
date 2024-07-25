@@ -11,13 +11,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Text
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -76,18 +77,22 @@ class MainActivityBannerWidth : ComponentActivity() {
             handleState()
         }
 
+        val mainContentsStateRemeber2: MutableState<MainContentsState2> =
+            mutableStateOf(MainContentsState2())
 
         setContent {
-            val mainContentsStateRemeber2: MutableState<MainContentsState2> =
-                mutableStateOf(MainContentsState2())
 
-            lifecycleScope.launch {
-                stateFlow.collect { mainContentState ->
-                    mainContentState?.let {
-                        mainContentsStateRemeber2.value = it
+
+            LaunchedEffect(key1 = "d") {
+                lifecycleScope.launch {
+                    stateFlow.collect { mainContentState ->
+                        mainContentState?.let {
+                            mainContentsStateRemeber2.value = it
+                        }
                     }
                 }
             }
+
 
 
 
@@ -99,7 +104,6 @@ class MainActivityBannerWidth : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun TestContent(
     mainContentsStateMutable2: MutableState<MainContentsState2>,
@@ -174,21 +178,25 @@ fun TestContent(
 @Preview(showBackground = true)
 @Composable
 fun TestContentPreview() {
+    val state = remember {
+        mutableStateOf(
+            MainContentsState2(
+                state1 = BannerState(
+                    bannerId = "banner x",
+                    onClick = {}
+                ),
+                state2 = BannerState(
+                    bannerId = "banner x",
+                    onClick = {}
+                ),
+                buttClick = {}
+            )
+        )
+    }
+
     ComposePlay3Theme {
         TestContent(
-            mainContentsStateMutable2 = mutableStateOf(
-                MainContentsState2(
-                    state1 = BannerState(
-                        bannerId = "banner x",
-                        onClick = {}
-                    ),
-                    state2 = BannerState(
-                        bannerId = "banner x",
-                        onClick = {}
-                    ),
-                    buttClick = {}
-                ),
-            )
+            mainContentsStateMutable2 = state
         )
     }
 }
@@ -197,5 +205,5 @@ data class MainContentsState2(
     val state1: BannerState? = null,
     val state2: BannerState? = null,
     val isBig: Boolean = false,
-    val buttClick: (()->Unit)? = null
+    val buttClick: (() -> Unit)? = null
 )
