@@ -1,30 +1,27 @@
 package com.example.composeplay3.ftabs
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,41 +29,65 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.composeplay3.R
+import com.example.composeplay3.ftabs.navigation.AppNavigationController
+import com.example.composeplay3.ftabs.navigation.Navs
+import com.example.composeplay3.ftabs.screens.basemain.ScreenBaseMain
+import com.example.composeplay3.ftabs.screens.basepayments.ScreenBasePayments
+import com.example.composeplay3.ftabs.screens.basesettings.ScreenBaseSettings
+import com.example.composeplay3.ftabs.screens.secondproduct.ScreenSecondProduct
 import com.example.composeplay3.ui.theme.ComposePlay3Theme
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-
-
-    companion object {
-        val items = listOf(
-            Navs.BaseOne,
-            Navs.BaseTwo,
-            Navs.BaseThree
-        )
-    }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
 
         super.onCreate(savedInstanceState)
 
+        //WindowCompat.setDecorFitsSystemWindows(window, false)
+        // Так же убрать
+        // (view.context as Activity).window.statusBarColor = colorScheme.primary.toArgb()
+        // в Theme
+
+
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.auto(
+                android.graphics.Color.TRANSPARENT,
+                android.graphics.Color.TRANSPARENT
+            ),
+            navigationBarStyle = SystemBarStyle.auto(
+                android.graphics.Color.TRANSPARENT,
+                android.graphics.Color.TRANSPARENT
+            )
+        )
+        if (Build.VERSION.SDK_INT >= 29) {
+            window.isNavigationBarContrastEnforced = false
+        }
 
         setContent {
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .background(Color.Green)
+//            ) {
+//                Text(text = "dsdds", modifier = Modifier.align(Alignment.TopCenter).systemBarsPadding())
+//                Text(text = "dsdds", modifier = Modifier.align(Alignment.BottomCenter))
+//            }
             val navController = rememberNavController()
+
+//            navController.addOnDestinationChangedListener { controller: NavController, destination: NavDestination, arguments: Bundle? ->
+//                Log.d("sads", "OnDestinationChangedListener destination = ${destination?.route}")
+//            }
 
             val mainContentsStateRemeber = remember {
                 mutableStateOf(
@@ -80,7 +101,7 @@ class MainActivity : ComponentActivity() {
             MainContent(
                 navController = navController,
                 mainContentsStateRemeber = mainContentsStateRemeber,
-                items = items
+                items = Navs.tabs
             )
         }
     }
@@ -110,53 +131,36 @@ fun MainContent(
                 .background(Color.Green)
         ) {
             NavHost(
-                modifier = Modifier.padding(top = 56.dp, bottom = 56.dp),
-                navController = navController, startDestination = Navs.BaseOne.screenRoute
+                modifier = Modifier.padding(top = 0.dp, bottom = 0.dp),
+                navController = navController, startDestination = Navs.ScreenBaseMain.screenRoute
             ) {
-                composable(route = "${Navs.Box.screenRoute}/{userId}?startScreen={startScreen}") { backStackEntry ->
-                    ScreenBox(
+                composable(route = Navs.ScreenBaseMain.screenRoute) {
+                    ScreenBaseMain(
+                        navController = navController
+                    )
+                }
+                composable(
+                    route = Navs.ScreenBasePayments.screenRoute,
+                ) {
+                    ScreenBasePayments(
+                        navController = navController
+                    )
+                }
+                composable(route = Navs.ScreenBaseSettings.screenRoute) {
+                    ScreenBaseSettings(
+                        navController = navController
+                    )
+                }
+
+                composable(route = "${Navs.ScreenSecondProduct.screenRoute}/{userId}?startScreen={startScreen}") { backStackEntry ->
+                    ScreenSecondProduct(
                         //viewModel = viewModel(modelClass = ScreenBoxViewModel::class.java),
                         userId = backStackEntry.arguments?.getString("userId") ?: "",
                         startScreen = backStackEntry.arguments?.getString("startScreen") ?: "",
                         navController = navController
                     )
                 }
-                composable(route = "${Navs.Constraint.screenRoute}/{userId}?startScreen={startScreen}") { backStackEntry ->
-                    ScreenConstraint(
-                        userId = backStackEntry.arguments?.getString("userId") ?: "",
-                        startScreen = backStackEntry.arguments?.getString("startScreen") ?: "",
-                        navController = navController
-                    )
-                }
-                composable(route = "${Navs.Row.screenRoute}/{userId}?startScreen={startScreen}") { backStackEntry ->
-                    ScreenRow(
-                        userId = backStackEntry.arguments?.getString("userId") ?: "",
-                        startScreen = backStackEntry.arguments?.getString("startScreen") ?: "",
-                        navController = navController
-                    )
-                }
-                composable(route = "${Navs.Col.screenRoute}/{userId}?startScreen={startScreen}") { backStackEntry ->
-                    ScreenColumn(
-                        userId = backStackEntry.arguments?.getString("userId") ?: "",
-                        startScreen = backStackEntry.arguments?.getString("startScreen") ?: "",
-                        navController = navController
-                    )
-                }
-                composable(route = Navs.BaseOne.screenRoute) {
-                    ScreenBaseOne(
-                        navController = navController
-                    )
-                }
-                composable(route = Navs.BaseTwo.screenRoute) {
-                    ScreenBaseTwo(
-                        navController = navController
-                    )
-                }
-                composable(route = Navs.BaseThree.screenRoute) {
-                    ScreenBaseThree(
-                        navController = navController
-                    )
-                }
+
 
                 composable(route = "${Navs.SheetOne.screenRoute}/{userId}?startScreen={startScreen}") { backStackEntry ->
                     SheetOne(
@@ -167,58 +171,25 @@ fun MainContent(
                 }
             }
 
-            TopAppBar(
-                navigationIcon = {
-                    Icon(Icons.Filled.Menu, contentDescription = "Меню")
-                },
-                title = {
-                    Text("METANIT.COM", fontSize = 22.sp)
-                },
-                actions = {
-                    IconButton(onClick = {
-                        scope.launch {
-                            Log.d("mmeme", "show")
-                            stateSheet.show()
-                        }
-                    }) {
-                        Icon(
-                            imageVector = Icons.Filled.Search,
-                            contentDescription = "Меню",
-                        )
-                    }
-                }
-            )
 
             NavigationBar(
-                modifier = Modifier.align(Alignment.BottomCenter),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .systemBarsPadding(),
                 contentColor = Color.Black
             ) {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
 
-                Log.d("sads", "currentDestination = ${currentDestination?.route}")
-                val hierarchy = currentDestination?.hierarchy
-                if (hierarchy != null) {
-                    for (dest in hierarchy) {
-                        Log.d("sads", "hierarchy = ${dest?.route}")
-                    }
-                }
 
-                for (navBack in navController.currentBackStack.value) {
-                    Log.d("sads", "navBack = ${navBack.destination.route}")
-                }
 
                 val backEnabled = items.any {
                     it.screenRoute == navController.currentDestination?.route &&
-                            navController.currentDestination?.route != Navs.BaseOne.screenRoute
+                            navController.currentDestination?.route != Navs.ScreenBaseMain.screenRoute
                 }
                 BackHandler(enabled = backEnabled) {
                     Log.d("asdsad", "BackHandler")
-
-                    bottomNavigatonClick(
-                        navController = navController,
-                        nav = Navs.BaseOne
-                    )
+                    navController.bottomNavigatonClick(Navs.ScreenBaseMain.screenRoute)
                 }
 
 
@@ -228,51 +199,50 @@ fun MainContent(
                         it.destination.route == nav.screenRoute
                     }
 
-//                        val selected = false
-
                     NavigationBarItem(
                         icon = { Icon(painterResource(id = nav.icon), null) },
                         label = { Text(text = nav.title) },
                         selected = selected,
                         onClick = {
-                            bottomNavigatonClick(
-                                navController = navController,
-                                nav = nav
-                            )
+                            navController.bottomNavigatonClick(nav.screenRoute)
                         }
                     )
                 }
             }
         }
-
-        Text(text = mainContentsStateRemeber.value.state)
-
     }
 }
 
 
 @SuppressLint("RestrictedApi")
-fun bottomNavigatonClick(navController: NavController, nav: Navs) {
-//    val currentBaseTab: NavDestination = navController.backQueue[1].destination
+fun NavController?.bottomNavigatonClick(screenRoute: String) {
+    val navController = this
+    navController?.navigate(screenRoute) {
 
-    val currentBaseTab = navController.currentBackStack.value[1].destination
-    navController.navigate(nav.screenRoute) {
-        // Pop up to the start destination of the graph to
-        // avoid building up a large stack of destinations
-        // on the back stack as users select items
-        popUpTo(currentBaseTab.id) {
-            saveState = true
-            inclusive = true
+        val currentBaseTab = navController?.currentBackStack?.value?.get(1)?.destination
+        val curTabNavDestination = navController?.graph?.findNode(
+            route = screenRoute
+        )
+
+        if (Navs.isTab(screenRoute = screenRoute) && currentBaseTab != null) {
+            // Pop up to the start destination of the graph to
+            // avoid building up a large stack of destinations
+            // on the back stack as users select items
+            popUpTo(currentBaseTab.id) {
+                saveState = curTabNavDestination != currentBaseTab
+                inclusive = true
+            }
+
+            if (curTabNavDestination != currentBaseTab) {
+                // Avoid multiple copies of the same destination when
+                // reselecting the same item
+                launchSingleTop = true
+                // Restore state when reselecting a previously selected item
+                restoreState = true
+            }
         }
-
-        // Avoid multiple copies of the same destination when
-        // reselecting the same item
-        launchSingleTop = true
-        // Restore state when reselecting a previously selected item
-        restoreState = true
     }
 }
-
 
 data class MainContentsState(
     val state: String

@@ -1,56 +1,67 @@
-package com.example.composeplay3.ftabs
+package com.example.composeplay3.ftabs.navigation
 
 sealed class Navs(var title: String, var icon: Int, var screenRoute: String) {
 
-
-    object BaseOne : Navs(
-        title = "BaseOne",
+    data object ScreenBaseMain : Navs(
+        title = "ScreenBaseMain",
         icon = androidx.core.R.drawable.ic_call_answer,
-        screenRoute = "screenBaseOne"
+        screenRoute = "ScreenBaseMain"
     )
 
-    object BaseTwo : Navs(
-        title = "BaseTwo",
+    data object ScreenBasePayments : Navs(
+        title = "ScreenBasePayments",
         icon = androidx.core.R.drawable.ic_call_decline,
-        screenRoute = "screenBaseTwo"
+        screenRoute = "ScreenBasePayments"
     )
 
-    object BaseThree : Navs(
-        title = "BaseThree",
+    data object ScreenBaseSettings : Navs(
+        title = "ScreenBaseSettings",
         icon = androidx.core.R.drawable.ic_call_answer_video_low,
-        screenRoute = "screenBaseThree"
+        screenRoute = "ScreenBaseSettings"
     )
 
-    object Box : Navs(
+    data object ScreenSecondProduct : Navs(
         title = "Box",
         icon = androidx.core.R.drawable.ic_call_answer,
         screenRoute = "screenBox"
     )
 
-    object Constraint : Navs(
+    data object Constraint : Navs(
         title = "Constraint",
         icon = androidx.core.R.drawable.ic_call_answer_video,
         screenRoute = "screenConstraint"
     )
 
-    object Row : Navs(
+    data object Row : Navs(
         title = "Row",
         icon = androidx.core.R.drawable.ic_call_answer_video,
         screenRoute = "screenRow"
     )
 
-    object Col : Navs(
+    data object Col : Navs(
         title = "Col",
         icon = androidx.core.R.drawable.ic_call_answer_video,
         screenRoute = "screenCol"
     )
 
 
-    object SheetOne : Navs(
+    data object SheetOne : Navs(
         title = "SheetOne",
         icon = androidx.core.R.drawable.ic_call_answer_video,
         screenRoute = "sheetOne"
     )
+
+    companion object {
+        val tabs = listOf(
+            ScreenBaseMain, ScreenBasePayments, ScreenBaseSettings
+        )
+
+        fun isTab(screenRoute: String): Boolean {
+            return tabs.any {
+                it.screenRoute == screenRoute
+            }
+        }
+    }
 }
 
 var ii = 0
