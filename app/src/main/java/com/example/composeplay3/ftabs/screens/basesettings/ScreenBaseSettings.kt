@@ -18,14 +18,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.example.composeplay3.ftabs.navigation.AppNavigationController
-import com.example.composeplay3.ftabs.ui.ComposableNav
+import com.example.composeplay3.ftabs.ui.nav.NavButtons
+import com.example.composeplay3.ftabs.ui.nav.NavButtonsState
 import com.example.composeplay3.ui.theme.ComposePlay3Theme
 
 @Composable
 fun ScreenBaseSettings(
-    navController: NavController? = null
+    navButtonsState: NavButtonsState = NavButtonsState.NavButtonsStateTest
 ) {
     Box(
         modifier = Modifier
@@ -46,8 +45,8 @@ fun ScreenBaseSettings(
         Column(
             modifier = Modifier.padding(top = 30.dp).verticalScroll(scrollState)
         ) {
-            ComposableNav(
-                navController = navController
+            NavButtons(
+                navButtonsState = navButtonsState
             )
         }
 

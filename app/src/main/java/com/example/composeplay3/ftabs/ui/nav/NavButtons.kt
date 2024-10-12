@@ -1,4 +1,4 @@
-package com.example.composeplay3.ftabs.ui
+package com.example.composeplay3.ftabs.ui.nav
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,25 +7,22 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavController
-import com.example.composeplay3.ftabs.bottomNavigatonClick
 import com.example.composeplay3.ftabs.navigation.Navs
 import com.example.composeplay3.ui.theme.ComposePlay3Theme
 
 @Composable
-fun ComposableNav(navController: NavController? = null) {
+fun NavButtons(navButtonsState: NavButtonsState) {
 
     val scrollState = rememberScrollState()
     Column() {
         Row {
             Button(
                 onClick = {
-                    navController?.bottomNavigatonClick(Navs.ScreenBaseMain.screenRoute)
+                    navButtonsState.goto(Navs.ScreenBaseMain.screenRoute)
                 },
                 modifier = Modifier
                     .wrapContentWidth()
@@ -40,7 +37,7 @@ fun ComposableNav(navController: NavController? = null) {
 
             Button(
                 onClick = {
-                    navController?.bottomNavigatonClick(Navs.ScreenBasePayments.screenRoute)
+                    navButtonsState.goto(Navs.ScreenBasePayments.screenRoute)
                 },
                 modifier = Modifier
                     .wrapContentWidth()
@@ -55,7 +52,7 @@ fun ComposableNav(navController: NavController? = null) {
 
             Button(
                 onClick = {
-                    navController?.bottomNavigatonClick(Navs.ScreenBaseSettings.screenRoute)
+                    navButtonsState.goto(Navs.ScreenBaseSettings.screenRoute)
                 },
                 modifier = Modifier
                     .wrapContentWidth()
@@ -71,7 +68,9 @@ fun ComposableNav(navController: NavController? = null) {
 
 
         Button(
-            onClick = { navController?.navigate(Navs.ScreenSecondProduct.screenRoute + "/xxx?startScreen=one") },
+            onClick = {
+                navButtonsState.goto(Navs.ScreenSecondProduct.screenRoute + "/xxx?startScreen=one")
+            },
             modifier = Modifier
                 .wrapContentWidth()
         ) {
@@ -83,24 +82,11 @@ fun ComposableNav(navController: NavController? = null) {
             )
         }
 
-        Button(
-            onClick = { navController?.navigate(Navs.Row.screenRoute + "/xxx?startScreen=one") },
-            modifier = Modifier
-                .wrapContentWidth()
-        ) {
-            Text(
-                text = "Row",
-                style = TextStyle(
-                    color = Color.Red
-                )
-            )
-        }
-
 
         Row {
             Button(
                 onClick = {
-                    navController?.bottomNavigatonClick(Navs.ScreenBaseMain.screenRoute)
+                    navButtonsState.tabBarVisible(false)
                 },
                 modifier = Modifier
                     .wrapContentWidth()
@@ -115,7 +101,7 @@ fun ComposableNav(navController: NavController? = null) {
 
             Button(
                 onClick = {
-                    navController?.bottomNavigatonClick(Navs.ScreenBasePayments.screenRoute)
+                    navButtonsState.tabBarVisible(true)
                 },
                 modifier = Modifier
                     .wrapContentWidth()
@@ -137,6 +123,11 @@ fun ComposableNav(navController: NavController? = null) {
 @Composable
 fun ComposableNavPreview() {
     ComposePlay3Theme {
-        ComposableNav()
+        NavButtons(
+            navButtonsState = NavButtonsState(
+                goto = {},
+                tabBarVisible = {}
+            )
+        )
     }
 }
