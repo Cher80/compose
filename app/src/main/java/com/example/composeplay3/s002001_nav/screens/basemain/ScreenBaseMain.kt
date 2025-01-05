@@ -1,5 +1,6 @@
-package com.example.composeplay3.ftabs.screens.basemain
+package com.example.composeplay3.s002001_nav.screens.basemain
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,21 +13,23 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.composeplay3.ftabs.ui.nav.NavButtons
-import com.example.composeplay3.ftabs.ui.nav.NavButtonsState
+import com.example.composeplay3.s002001_nav.ui.nav.NavButtons
+import com.example.composeplay3.s002001_nav.ui.nav.NavButtonsState
 import com.example.composeplay3.ui.theme.ComposePlay3Theme
 
 
 @Composable
-fun ScreenBaseMain(
-    navButtonsState: NavButtonsState = NavButtonsState.NavButtonsStateTest
-) {
+fun ScreenBaseMain(navButtonsState: NavButtonsState) {
+
+    Log.d("gcompose", "ScreenBaseMain")
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -35,7 +38,8 @@ fun ScreenBaseMain(
     ) {
         Text(
             modifier = Modifier
-                .wrapContentWidth().align(Alignment.TopCenter),
+                .wrapContentWidth()
+                .align(Alignment.TopCenter),
             text = "ScreenBaseMain",
             style = TextStyle(
                 color = Color.Red
@@ -44,7 +48,9 @@ fun ScreenBaseMain(
 
         val scrollState = rememberScrollState()
         Column(
-            modifier = Modifier.padding(top = 30.dp).verticalScroll(scrollState)
+            modifier = Modifier
+                .padding(top = 30.dp)
+                .verticalScroll(scrollState)
         ) {
             NavButtons(
                 navButtonsState = navButtonsState
@@ -53,7 +59,8 @@ fun ScreenBaseMain(
 
         Text(
             modifier = Modifier
-                .wrapContentWidth().align(Alignment.BottomCenter),
+                .wrapContentWidth()
+                .align(Alignment.BottomCenter),
             text = "ScreenBaseMainEnd",
             style = TextStyle(
                 color = Color.Red
@@ -66,6 +73,8 @@ fun ScreenBaseMain(
 @Composable
 fun ScreenBaseMainPreview() {
     ComposePlay3Theme {
-        ScreenBaseMain()
+        ScreenBaseMain(
+            navButtonsState = NavButtonsState.TEST
+        )
     }
 }

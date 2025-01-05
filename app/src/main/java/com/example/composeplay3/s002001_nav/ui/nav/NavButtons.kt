@@ -1,4 +1,4 @@
-package com.example.composeplay3.ftabs.ui.nav
+package com.example.composeplay3.s002001_nav.ui.nav
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.composeplay3.ftabs.navigation.Navs
+import com.example.composeplay3.s002001_nav.navigation.Navs
 import com.example.composeplay3.ui.theme.ComposePlay3Theme
 
 @Composable
@@ -22,7 +22,7 @@ fun NavButtons(navButtonsState: NavButtonsState) {
         Row {
             Button(
                 onClick = {
-                    navButtonsState.goto(Navs.ScreenBaseMain.screenRoute)
+                    navButtonsState.gotoRoute(Navs.ScreenBaseMain.screenRoute)
                 },
                 modifier = Modifier
                     .wrapContentWidth()
@@ -37,7 +37,7 @@ fun NavButtons(navButtonsState: NavButtonsState) {
 
             Button(
                 onClick = {
-                    navButtonsState.goto(Navs.ScreenBasePayments.screenRoute)
+                    navButtonsState.gotoRoute(Navs.ScreenBasePayments.screenRoute)
                 },
                 modifier = Modifier
                     .wrapContentWidth()
@@ -52,7 +52,7 @@ fun NavButtons(navButtonsState: NavButtonsState) {
 
             Button(
                 onClick = {
-                    navButtonsState.goto(Navs.ScreenBaseSettings.screenRoute)
+                    navButtonsState.gotoRoute(Navs.ScreenBaseSettings.screenRoute)
                 },
                 modifier = Modifier
                     .wrapContentWidth()
@@ -69,7 +69,7 @@ fun NavButtons(navButtonsState: NavButtonsState) {
 
         Button(
             onClick = {
-                navButtonsState.goto(Navs.ScreenSecondProduct.screenRoute + "/xxx?startScreen=one")
+                navButtonsState.gotoRoute(Navs.ScreenSecondProduct.screenRoute + "/xxx?startScreen=one")
             },
             modifier = Modifier
                 .wrapContentWidth()
@@ -124,10 +124,7 @@ fun NavButtons(navButtonsState: NavButtonsState) {
 fun ComposableNavPreview() {
     ComposePlay3Theme {
         NavButtons(
-            navButtonsState = NavButtonsState(
-                goto = {},
-                tabBarVisible = {}
-            )
+            navButtonsState = NavButtonsState.TEST
         )
     }
 }

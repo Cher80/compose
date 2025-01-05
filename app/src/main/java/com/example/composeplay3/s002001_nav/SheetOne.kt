@@ -1,12 +1,10 @@
-package com.example.composeplay3.ftabs.screens.secondproduct
+package com.example.composeplay3.s002001_nav
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -14,39 +12,34 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.composeplay3.ftabs.ui.nav.NavButtonsState
+import androidx.navigation.NavController
 import com.example.composeplay3.ui.theme.ComposePlay3Theme
 
-
 @Composable
-fun ScreenSecondProduct(
-    userId: String, startScreen: String,
-    navButtonsState: NavButtonsState = NavButtonsState.NavButtonsStateTest
-) {
-    Log.d("mmeme", "ScreenBox userId=$userId")
+fun SheetOne(userId: String, startScreen: String, navController: NavController? = null) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF64965C), RoundedCornerShape(16.dp))
+            .background(Color(0xff00ffFF))
     ) {
 
         Text(
             modifier = Modifier
                 .wrapContentWidth()
+                .padding(16.dp)
                 .padding(16.dp),
-            text = "ScreenSecondProduct $startScreen $userId",
+            text = "A'm sheet $startScreen $userId",
             style = TextStyle(
                 color = Color.Black
             )
         )
     }
-
 }
 
 @Preview(showBackground = true)
 @Composable
-fun ScreenSecondProductPreview() {
+fun SheetOnePreview() {
     ComposePlay3Theme {
-        ScreenSecondProduct("Android", "ios")
+        SheetOne("Android", "ios")
     }
 }

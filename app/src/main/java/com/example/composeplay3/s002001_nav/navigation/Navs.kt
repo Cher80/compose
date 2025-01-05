@@ -1,4 +1,4 @@
-package com.example.composeplay3.ftabs.navigation
+package com.example.composeplay3.s002001_nav.navigation
 
 
 enum class Navs(var title: String, var icon: Int, var screenRoute: String) {

@@ -1,4 +1,4 @@
-package com.example.composeplay3.ftabs
+package com.example.composeplay3.s002001_nav
 
 import android.annotation.SuppressLint
 import android.os.Build
@@ -21,69 +21,61 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.DisposableEffectResult
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.composeplay3.ftabs.navigation.NavEvent
-import com.example.composeplay3.ftabs.navigation.Navs
-import com.example.composeplay3.ftabs.screens.basemain.ScreenBaseMain
-import com.example.composeplay3.ftabs.screens.basepayments.ScreenBasePayments
-import com.example.composeplay3.ftabs.screens.basesettings.ScreenBaseSettings
-import com.example.composeplay3.ftabs.screens.secondproduct.ScreenSecondProduct
-import com.example.composeplay3.ftabs.ui.nav.NavButtonsState
+import com.example.composeplay3.s002001_nav.navigation.AppNavigationController
+import com.example.composeplay3.s002001_nav.navigation.NavEvent
+import com.example.composeplay3.s002001_nav.navigation.Navs
+import com.example.composeplay3.s002001_nav.screens.basemain.ScreenBaseMain
+import com.example.composeplay3.s002001_nav.screens.basepayments.ScreenBasePayments
+import com.example.composeplay3.s002001_nav.screens.basesettings.ScreenBaseSettings
+import com.example.composeplay3.s002001_nav.screens.secondproduct.ScreenSecondProduct
+import com.example.composeplay3.s002001_nav.screens.secondproduct.SecondProductState
+import com.example.composeplay3.s002001_nav.screens.secondproduct.SecondProductViewModel
+import com.example.composeplay3.s002001_nav.ui.nav.NavButtonsState
 import com.example.composeplay3.ui.theme.ComposePlay3Theme
-import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
     var tabBarVisibility: Boolean = true
     val startTabRoute: String = Navs.ScreenBaseMain.screenRoute
-    var selectedTabRoute: String = Navs.ScreenBaseMain.screenRoute
     val tabs = listOf(Navs.ScreenBaseMain, Navs.ScreenBasePayments, Navs.ScreenBaseSettings)
-    var navController: NavHostController? = null
 
     var mainContentsStateMutable = mutableStateOf<MainContentsState?>(null)
+    val appNavigationController = AppNavigationController()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val navEvents: MutableSharedFlow<NavEvent> = MutableSharedFlow(
-            replay = 0,
-            extraBufferCapacity = 1,
-            onBufferOverflow = BufferOverflow.DROP_OLDEST
-        )
-
         handleState()
 
-        lifecycleScope.launch {
-            delay(5000)
-//            navEvents.emit(
-//                NavEvent.Navigate(
-//                    route = Navs.ScreenBaseSettings.screenRoute
-//                )
-//            )
-        }
-        //WindowCompat.setDecorFitsSystemWindows(window, false)
-        // Так же убрать
-        // (view.context as Activity).window.statusBarColor = colorScheme.primary.toArgb()
-        // в Theme
-
-
+        /**
+         * внутри edge to edge WindowCompat.setDecorFitsSystemWindows(window, false)
+         * так же убрать (view.context as Activity).window.statusBarColor = colorScheme.primary.toArgb() в Theme
+         */
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.auto(
                 android.graphics.Color.TRANSPARENT,
@@ -100,29 +92,30 @@ class MainActivity : ComponentActivity() {
 
 
         setContent {
-            navController = rememberNavController()
-
-            val navEventState = remember {
-                mutableStateOf<NavEvent>(NavEvent.NO)
-            }
-
-
-//            val mainContentsStateRemeber = remember {
-//                mainContentsStateMutable
-//            }
-
+            val navController = rememberNavController()
 
             LaunchedEffect(Unit) {
-                navEvents.collect { navEvent ->
-                    Log.d("asadff", "navEvent = $navEvent")
-                    navEventState.value = navEvent
+                appNavigationController.navEvents.collect { navEvent ->
+                    Log.d("gcompose", "navEvent = $navEvent")
+                    when (navEvent) {
+                        is NavEvent.Navigate -> {
+                            navController.bottomNavigatonClick(
+                                screenRoute = navEvent.route,
+                                tabs = tabs
+                            )
+                        }
+                        is NavEvent.TabBarVisibility -> {
+                            tabBarVisibility = navEvent.visible
+                            handleState()
+                        }
+                        is NavEvent.NO -> {}
+                    }
                 }
             }
 
             MainContent(
-                navController = navController!!,
-                mainContentsState = mainContentsStateMutable,
-                navEventsState = navEventState
+                navController = navController,
+                mainContentsState = mainContentsStateMutable
             )
         }
     }
@@ -132,37 +125,17 @@ class MainActivity : ComponentActivity() {
         Log.d("asadff", "handleState")
         mainContentsStateMutable.value = MainContentsState(
             navButtonsState = NavButtonsState(
-                goto = { route ->
-                    navController.bottomNavigatonClick(route, tabs)
-                    handleState()
-//                    navEventState.value = NavEvent.Navigate(
-//                        route = route
-//                    )
-                },
-                tabBarVisible = {}
+                gotoRoute = appNavigationController::gotoRoute,
+                tabBarVisible = appNavigationController::tabBarVisible
             ),
             tabBarVisibility = tabBarVisibility,
             startTabRoute = startTabRoute,
-            tabBarClicked = { route ->
-                navController.bottomNavigatonClick(route, tabs)
-                handleState()
-            },
-            tabBarBackEnabled = tabs.any {
-                    it.screenRoute == navController?.currentDestination?.route &&
-                            navController?.currentDestination?.route != Navs.ScreenBaseMain.screenRoute
-                },
-            tabBarBackClicked = {
-                navController.bottomNavigatonClick(Navs.ScreenBaseMain.screenRoute, tabs)
-                handleState()
-            },
+            gotoRoute = appNavigationController::gotoRoute,
             tabStates = tabs.map { nav ->
                 TabState(
-                    nav = nav,
-                    selected = navController?.currentBackStack?.value?.any {
-                        it.destination.route == nav.screenRoute
-                    } == true
+                    nav = nav
                 )
-            }
+            }.toPersistentList()
         )
     }
 }
@@ -173,19 +146,11 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainContent(
     navController: NavHostController,
-    mainContentsState: MutableState<MainContentsState?>,
-    navEventsState: MutableState<NavEvent>
+    mainContentsState: MutableState<MainContentsState?>
 ) {
-    Log.d("asadff", "MainContent tabBarBackEnabled=${mainContentsState.value?.tabBarBackEnabled} tabBarVisibility=${mainContentsState.value?.tabBarVisibility}")
+    Log.d("gcompose", "MainContent tabBarVisibility=${mainContentsState.value?.tabBarVisibility}")
     val mainContentsStateValue = mainContentsState.value ?: return
-    Log.d("asadff", "MainContent DO")
-//    when (val navEvent = navEventsState.value) {
-//        is NavEvent.Navigate -> {
-//             navController.bottomNavigatonClick(navEvent.route)
-//        }
-//
-//        is NavEvent.NO -> {}
-//    }
+    Log.d("gcompose", "MainContent DO")
 
     ComposePlay3Theme {
         // A surface container using the 'background' color from the theme
@@ -196,7 +161,7 @@ fun MainContent(
         ) {
 
             Box(modifier = Modifier.size(width = 100.dp, height = 100.dp)) {
-                Log.d("asadff", "Box")
+                Log.d("gcompose", "Box")
                 Text(text = "xxx")
             }
 
@@ -204,9 +169,9 @@ fun MainContent(
                 modifier = Modifier.padding(top = 0.dp, bottom = 0.dp),
                 navController = navController, startDestination = Navs.ScreenBaseMain.screenRoute
             ) {
-                Log.d("asadff", "NavHost")
+                Log.d("gcompose", "NavHost")
                 composable(route = Navs.ScreenBaseMain.screenRoute) {
-                    Log.d("asadff", "NavHost ScreenBaseMain")
+                    Log.d("gcompose", "NavHost ScreenBaseMain")
                     ScreenBaseMain(
                         navButtonsState = mainContentsStateValue.navButtonsState
                     )
@@ -214,24 +179,45 @@ fun MainContent(
                 composable(
                     route = Navs.ScreenBasePayments.screenRoute,
                 ) {
-                    Log.d("asadff", "NavHost ScreenBasePayments")
+                    Log.d("gcompose", "NavHost ScreenBasePayments")
                     ScreenBasePayments(
                         navButtonsState = mainContentsStateValue.navButtonsState
                     )
                 }
                 composable(route = Navs.ScreenBaseSettings.screenRoute) {
-                    Log.d("asadff", "NavHost ScreenBaseSettings")
+                    Log.d("gcompose", "NavHost ScreenBaseSettings")
                     ScreenBaseSettings(
                         navButtonsState = mainContentsStateValue.navButtonsState
                     )
                 }
 
                 composable(route = "${Navs.ScreenSecondProduct.screenRoute}/{userId}?startScreen={startScreen}") { backStackEntry ->
-                    Log.d("asadff", "NavHost ScreenSecondProduct")
+                    Log.d("gcompose", "NavHost ScreenSecondProduct")
+
+                    val viewModel: SecondProductViewModel = viewModel<SecondProductViewModel>()
+                    val userId = backStackEntry.arguments?.getString("userId") ?: ""
+                    val startScreen = backStackEntry.arguments?.getString("startScreen") ?: ""
+                    viewModel.onCreate(
+                        userId = userId,
+                        startScreen = startScreen
+                    )
+//                    val viewModel = remember {
+//                        SecondProductViewModel()
+//                    }
+
+
+                    var secondProductStateRemeberMutable: SecondProductState? by remember { mutableStateOf<SecondProductState?>(null) }
+
+                    LaunchedEffect(Unit) {
+                        Log.d("gcompose", "NavHost ScreenSecondProduct LaunchedEffect")
+                        viewModel.secondProductStateFlow.collect {
+                            Log.d("gcompose", "NavHost ScreenSecondProduct collect secondProductStateFlow =$it")
+                            secondProductStateRemeberMutable = it
+                        }
+                    }
+
                     ScreenSecondProduct(
-                        //viewModel = viewModel(modelClass = ScreenBoxViewModel::class.java),
-                        userId = backStackEntry.arguments?.getString("userId") ?: "",
-                        startScreen = backStackEntry.arguments?.getString("startScreen") ?: "",
+                        secondProductState = secondProductStateRemeberMutable,
                         navButtonsState = mainContentsStateValue.navButtonsState
                     )
                 }
@@ -253,19 +239,21 @@ fun MainContent(
                     .systemBarsPadding(),
                 contentColor = Color.Black
             ) {
-                Log.d("asadff", "NavigationBar")
+                Log.d("gcompose", "NavigationBar")
 
-//                val navBackStackEntry by navController.currentBackStackEntryAsState()
-//                val currentDestination = navBackStackEntry?.destination
-//                Log.d("asadff", "currentDestination = $currentDestination")
+                // recompose на изменение стека !! не убирать
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentDestination = navBackStackEntry?.destination
+                Log.d("gcompose", "NavigationBar currentDestination = $currentDestination")
 
-//                val backEnabled = mainContentsStateValue.tabStates.any {
-//                    it.nav.screenRoute == navController.currentDestination?.route &&
-//                            navController.currentDestination?.route != Navs.ScreenBaseMain.screenRoute
-//                }
-                BackHandler(enabled = mainContentsStateValue.tabBarBackEnabled) {
-                    Log.d("asadff", "BackHandler")
-                    mainContentsStateValue.tabBarBackClicked()
+                val backEnabled = mainContentsStateValue.tabStates.any {
+                    it.nav.screenRoute == navController.currentDestination?.route &&
+                            navController.currentDestination?.route != Navs.ScreenBaseMain.screenRoute
+                }
+                BackHandler(enabled = backEnabled) {
+//                BackHandler(enabled = mainContentsStateValue.tabBarBackEnabled) {
+                    Log.d("gcompose", "BackHandler")
+                    mainContentsStateValue.gotoRoute(Navs.ScreenBaseMain.screenRoute)
 //                    navController.bottomNavigatonClick(
 //                        Navs.ScreenBaseMain.screenRoute,
 //                        mainContentsStateValue.tabs
@@ -274,9 +262,9 @@ fun MainContent(
 
                 mainContentsStateValue.tabStates.forEachIndexed { index, tabState ->
 
-//                    val selected = navController.currentBackStack.value.any {
-//                        it.destination.route == nav.screenRoute
-//                    }
+                    val selected = navController.currentBackStack.value.any {
+                        it.destination.route == tabState.nav.screenRoute
+                    }
 
 //                    val selected = navController.currentBackStack.value.any {
 //                        mainContentsStateValue.selectedTabRoute == nav.screenRoute
@@ -285,10 +273,10 @@ fun MainContent(
                     NavigationBarItem(
                         icon = { Icon(painterResource(id = tabState.nav.icon), null) },
                         label = { Text(text = tabState.nav.title) },
-                        selected = tabState.selected,
+                        selected = selected, // tabState.selected,
                         onClick = {
                             //mainContentsState.value.navState.goto(nav.screenRoute)
-                            mainContentsStateValue.tabBarClicked(tabState.nav.screenRoute)
+                            mainContentsStateValue.gotoRoute(tabState.nav.screenRoute)
                             //navController.bottomNavigatonClick(nav.screenRoute, mainContentsStateValue.tabs)
                         }
                     )
@@ -334,9 +322,6 @@ data class MainContentsState(
     val navButtonsState: NavButtonsState,
     val tabBarVisibility: Boolean,
     val startTabRoute: String,
-    val tabBarClicked: (String) -> Unit,
-    val tabBarBackEnabled: Boolean,
-    val tabBarBackClicked: () -> Unit,
-    val tabStates: List<TabState>
+    val tabStates: ImmutableList<TabState>,
+    val gotoRoute: (String) -> Unit
 )
-
