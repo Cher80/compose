@@ -25,6 +25,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.DisposableEffectResult
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,7 +35,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.os.bundleOf
+import androidx.lifecycle.DEFAULT_ARGS_KEY
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.CreationExtras
+import androidx.lifecycle.viewmodel.MutableCreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -51,6 +56,7 @@ import com.example.composeplay3.s002001_nav.screens.basesettings.ScreenBaseSetti
 import com.example.composeplay3.s002001_nav.screens.secondproduct.ScreenSecondProduct
 import com.example.composeplay3.s002001_nav.screens.secondproduct.SecondProductState
 import com.example.composeplay3.s002001_nav.screens.secondproduct.SecondProductViewModel
+import com.example.composeplay3.s002001_nav.screens.secondproduct.SecondProductViewModelFactory
 import com.example.composeplay3.s002001_nav.ui.nav.NavButtonsState
 import com.example.composeplay3.ui.theme.ComposePlay3Theme
 import kotlinx.collections.immutable.ImmutableList
@@ -104,10 +110,12 @@ class MainActivity : ComponentActivity() {
                                 tabs = tabs
                             )
                         }
+
                         is NavEvent.TabBarVisibility -> {
                             tabBarVisibility = navEvent.visible
                             handleState()
                         }
+
                         is NavEvent.NO -> {}
                     }
                 }
@@ -138,148 +146,143 @@ class MainActivity : ComponentActivity() {
             }.toPersistentList()
         )
     }
-}
 
 
-@SuppressLint("RestrictedApi", "StateFlowValueCalledInComposition")
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MainContent(
-    navController: NavHostController,
-    mainContentsState: MutableState<MainContentsState?>
-) {
-    Log.d("gcompose", "MainContent tabBarVisibility=${mainContentsState.value?.tabBarVisibility}")
-    val mainContentsStateValue = mainContentsState.value ?: return
-    Log.d("gcompose", "MainContent DO")
+    @SuppressLint("RestrictedApi", "StateFlowValueCalledInComposition")
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun MainContent(
+        navController: NavHostController,
+        mainContentsState: MutableState<MainContentsState?>
+    ) {
+        Log.d(
+            "gcompose",
+            "MainContent tabBarVisibility=${mainContentsState.value?.tabBarVisibility}"
+        )
+        val mainContentsStateValue = mainContentsState.value ?: return
+        Log.d("gcompose", "MainContent DO")
 
-    ComposePlay3Theme {
-        // A surface container using the 'background' color from the theme
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Green)
-        ) {
-
-            Box(modifier = Modifier.size(width = 100.dp, height = 100.dp)) {
-                Log.d("gcompose", "Box")
-                Text(text = "xxx")
-            }
-
-            NavHost(
-                modifier = Modifier.padding(top = 0.dp, bottom = 0.dp),
-                navController = navController, startDestination = Navs.ScreenBaseMain.screenRoute
+        ComposePlay3Theme {
+            // A surface container using the 'background' color from the theme
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Green)
             ) {
-                Log.d("gcompose", "NavHost")
-                composable(route = Navs.ScreenBaseMain.screenRoute) {
-                    Log.d("gcompose", "NavHost ScreenBaseMain")
-                    ScreenBaseMain(
-                        navButtonsState = mainContentsStateValue.navButtonsState
-                    )
+
+                Box(modifier = Modifier.size(width = 100.dp, height = 100.dp)) {
+                    Log.d("gcompose", "Box")
+                    Text(text = "xxx")
                 }
-                composable(
-                    route = Navs.ScreenBasePayments.screenRoute,
+
+                NavHost(
+                    modifier = Modifier.padding(top = 0.dp, bottom = 0.dp),
+                    navController = navController,
+                    startDestination = Navs.ScreenBaseMain.screenRoute
                 ) {
-                    Log.d("gcompose", "NavHost ScreenBasePayments")
-                    ScreenBasePayments(
-                        navButtonsState = mainContentsStateValue.navButtonsState
-                    )
-                }
-                composable(route = Navs.ScreenBaseSettings.screenRoute) {
-                    Log.d("gcompose", "NavHost ScreenBaseSettings")
-                    ScreenBaseSettings(
-                        navButtonsState = mainContentsStateValue.navButtonsState
-                    )
-                }
-
-                composable(route = "${Navs.ScreenSecondProduct.screenRoute}/{userId}?startScreen={startScreen}") { backStackEntry ->
-                    Log.d("gcompose", "NavHost ScreenSecondProduct")
-
-                    val viewModel: SecondProductViewModel = viewModel<SecondProductViewModel>()
-                    val userId = backStackEntry.arguments?.getString("userId") ?: ""
-                    val startScreen = backStackEntry.arguments?.getString("startScreen") ?: ""
-                    viewModel.onCreate(
-                        userId = userId,
-                        startScreen = startScreen
-                    )
-//                    val viewModel = remember {
-//                        SecondProductViewModel()
-//                    }
-
-
-                    var secondProductStateRemeberMutable: SecondProductState? by remember { mutableStateOf<SecondProductState?>(null) }
-
-                    LaunchedEffect(Unit) {
-                        Log.d("gcompose", "NavHost ScreenSecondProduct LaunchedEffect")
-                        viewModel.secondProductStateFlow.collect {
-                            Log.d("gcompose", "NavHost ScreenSecondProduct collect secondProductStateFlow =$it")
-                            secondProductStateRemeberMutable = it
-                        }
+                    Log.d("gcompose", "NavHost")
+                    composable(route = Navs.ScreenBaseMain.screenRoute) {
+                        Log.d("gcompose", "NavHost ScreenBaseMain")
+                        ScreenBaseMain(
+                            navButtonsState = mainContentsStateValue.navButtonsState
+                        )
+                    }
+                    composable(
+                        route = Navs.ScreenBasePayments.screenRoute,
+                    ) {
+                        Log.d("gcompose", "NavHost ScreenBasePayments")
+                        ScreenBasePayments(
+                            navButtonsState = mainContentsStateValue.navButtonsState
+                        )
+                    }
+                    composable(route = Navs.ScreenBaseSettings.screenRoute) {
+                        Log.d("gcompose", "NavHost ScreenBaseSettings")
+                        ScreenBaseSettings(
+                            navButtonsState = mainContentsStateValue.navButtonsState
+                        )
                     }
 
-                    ScreenSecondProduct(
-                        secondProductState = secondProductStateRemeberMutable,
-                        navButtonsState = mainContentsStateValue.navButtonsState
-                    )
+                    composable(route = "${Navs.ScreenSecondProduct.screenRoute}/{userId}?startScreen={startScreen}") { backStackEntry ->
+                        Log.d("gcompose", "NavHost ScreenSecondProduct")
+
+                        val viewModel: SecondProductViewModel = viewModel(
+                            modelClass = SecondProductViewModel::class.java,
+                            factory = SecondProductViewModelFactory(),
+                            extras = MutableCreationExtras(initialExtras = defaultViewModelCreationExtras).apply {
+                                backStackEntry.arguments?.let {
+                                    set(
+                                        DEFAULT_ARGS_KEY, it
+                                    )
+                                }
+                            }
+                        )
+
+                        ScreenSecondProduct(
+                            secondProductState = viewModel.secondProductStateFlow.collectAsState().value,
+                            flyHeartAction = viewModel.flyHeartAction.collectAsState(null).value,
+                            navButtonsState = mainContentsStateValue.navButtonsState
+                        )
+                    }
+
+
+                    composable(route = "${Navs.SheetOne.screenRoute}/{userId}?startScreen={startScreen}") { backStackEntry ->
+                        SheetOne(
+                            userId = backStackEntry.arguments?.getString("userId") ?: "",
+                            startScreen = backStackEntry.arguments?.getString("startScreen") ?: "",
+                            navController = navController
+                        )
+                    }
                 }
 
 
-                composable(route = "${Navs.SheetOne.screenRoute}/{userId}?startScreen={startScreen}") { backStackEntry ->
-                    SheetOne(
-                        userId = backStackEntry.arguments?.getString("userId") ?: "",
-                        startScreen = backStackEntry.arguments?.getString("startScreen") ?: "",
-                        navController = navController
-                    )
-                }
-            }
+                NavigationBar(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .systemBarsPadding(),
+                    contentColor = Color.Black
+                ) {
+                    Log.d("gcompose", "NavigationBar")
 
+                    // recompose на изменение стека !! не убирать
+                    val navBackStackEntry by navController.currentBackStackEntryAsState()
+                    val currentDestination = navBackStackEntry?.destination
+                    Log.d("gcompose", "NavigationBar currentDestination = $currentDestination")
 
-            NavigationBar(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .systemBarsPadding(),
-                contentColor = Color.Black
-            ) {
-                Log.d("gcompose", "NavigationBar")
-
-                // recompose на изменение стека !! не убирать
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStackEntry?.destination
-                Log.d("gcompose", "NavigationBar currentDestination = $currentDestination")
-
-                val backEnabled = mainContentsStateValue.tabStates.any {
-                    it.nav.screenRoute == navController.currentDestination?.route &&
-                            navController.currentDestination?.route != Navs.ScreenBaseMain.screenRoute
-                }
-                BackHandler(enabled = backEnabled) {
+                    val backEnabled = mainContentsStateValue.tabStates.any {
+                        it.nav.screenRoute == navController.currentDestination?.route &&
+                                navController.currentDestination?.route != Navs.ScreenBaseMain.screenRoute
+                    }
+                    BackHandler(enabled = backEnabled) {
 //                BackHandler(enabled = mainContentsStateValue.tabBarBackEnabled) {
-                    Log.d("gcompose", "BackHandler")
-                    mainContentsStateValue.gotoRoute(Navs.ScreenBaseMain.screenRoute)
+                        Log.d("gcompose", "BackHandler")
+                        mainContentsStateValue.gotoRoute(Navs.ScreenBaseMain.screenRoute)
 //                    navController.bottomNavigatonClick(
 //                        Navs.ScreenBaseMain.screenRoute,
 //                        mainContentsStateValue.tabs
 //                    )
-                }
-
-                mainContentsStateValue.tabStates.forEachIndexed { index, tabState ->
-
-                    val selected = navController.currentBackStack.value.any {
-                        it.destination.route == tabState.nav.screenRoute
                     }
+
+                    mainContentsStateValue.tabStates.forEachIndexed { index, tabState ->
+
+                        val selected = navController.currentBackStack.value.any {
+                            it.destination.route == tabState.nav.screenRoute
+                        }
 
 //                    val selected = navController.currentBackStack.value.any {
 //                        mainContentsStateValue.selectedTabRoute == nav.screenRoute
 //                    }
 
-                    NavigationBarItem(
-                        icon = { Icon(painterResource(id = tabState.nav.icon), null) },
-                        label = { Text(text = tabState.nav.title) },
-                        selected = selected, // tabState.selected,
-                        onClick = {
-                            //mainContentsState.value.navState.goto(nav.screenRoute)
-                            mainContentsStateValue.gotoRoute(tabState.nav.screenRoute)
-                            //navController.bottomNavigatonClick(nav.screenRoute, mainContentsStateValue.tabs)
-                        }
-                    )
+                        NavigationBarItem(
+                            icon = { Icon(painterResource(id = tabState.nav.icon), null) },
+                            label = { Text(text = tabState.nav.title) },
+                            selected = selected, // tabState.selected,
+                            onClick = {
+                                //mainContentsState.value.navState.goto(nav.screenRoute)
+                                mainContentsStateValue.gotoRoute(tabState.nav.screenRoute)
+                                //navController.bottomNavigatonClick(nav.screenRoute, mainContentsStateValue.tabs)
+                            }
+                        )
+                    }
                 }
             }
         }

@@ -1,5 +1,6 @@
 package com.example.composeplay3.s002001_nav.ui.nav
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -17,6 +18,7 @@ import com.example.composeplay3.ui.theme.ComposePlay3Theme
 @Composable
 fun NavButtons(navButtonsState: NavButtonsState) {
 
+    Log.d("gcompose", "NavButtons compose")
     val scrollState = rememberScrollState()
     Column() {
         Row {
