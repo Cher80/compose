@@ -16,7 +16,7 @@ import androidx.navigation.NavController
 import com.example.composeplay3.ui.theme.ComposePlay3Theme
 
 @Composable
-fun SheetOne(userId: String, startScreen: String, navController: NavController? = null) {
+fun SheetOne(userId: String, startScreen: String) {
     Column(
         modifier = Modifier
             .fillMaxSize()

@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.composeplay3.s002001_nav.navigation.Navs
 import com.example.composeplay3.ui.theme.ComposePlay3Theme
 
 @Composable
@@ -24,7 +23,7 @@ fun NavButtons(navButtonsState: NavButtonsState) {
         Row {
             Button(
                 onClick = {
-                    navButtonsState.gotoRoute(Navs.ScreenBaseMain.screenRoute)
+                    navButtonsState.gotoRoute("ScreenBaseMain")
                 },
                 modifier = Modifier
                     .wrapContentWidth()
@@ -39,7 +38,7 @@ fun NavButtons(navButtonsState: NavButtonsState) {
 
             Button(
                 onClick = {
-                    navButtonsState.gotoRoute(Navs.ScreenBasePayments.screenRoute)
+                    navButtonsState.gotoRoute("ScreenBasePayments")
                 },
                 modifier = Modifier
                     .wrapContentWidth()
@@ -54,7 +53,7 @@ fun NavButtons(navButtonsState: NavButtonsState) {
 
             Button(
                 onClick = {
-                    navButtonsState.gotoRoute(Navs.ScreenBaseSettings.screenRoute)
+                    navButtonsState.gotoRoute("ScreenBaseSettings")
                 },
                 modifier = Modifier
                     .wrapContentWidth()
@@ -71,7 +70,7 @@ fun NavButtons(navButtonsState: NavButtonsState) {
 
         Button(
             onClick = {
-                navButtonsState.gotoRoute(Navs.ScreenSecondProduct.screenRoute + "/xxx?startScreen=one")
+                navButtonsState.gotoRoute("ScreenSecondProduct/xxx?startScreen=one")
             },
             modifier = Modifier
                 .wrapContentWidth()
