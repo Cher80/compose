@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
@@ -66,6 +67,31 @@ class SecondProductViewModel(
             flyHeart = ::flyHeart
         )
     }
+
+    fun onResume() {
+        Log.d("gcompose", "SecondProductViewModel onResume")
+    }
+
+    fun onPause() {
+        Log.d("gcompose", "SecondProductViewModel onPause")
+    }
+
+    fun onCreate() {
+        Log.d("gcompose", "SecondProductViewModel onCreate")
+    }
+
+    fun onDestroy() {
+        Log.d("gcompose", "SecondProductViewModel onDestroy")
+    }
+
+    fun onStart() {
+        Log.d("gcompose", "SecondProductViewModel onStart")
+    }
+
+    fun onStop() {
+        Log.d("gcompose", "SecondProductViewModel onStop")
+    }
+
 
     override fun onCleared() {
         Log.d("gcompose", "SecondProductViewModel onCleared")

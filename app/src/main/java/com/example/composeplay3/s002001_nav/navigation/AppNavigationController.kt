@@ -4,11 +4,13 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.lifecycle.DEFAULT_ARGS_KEY
-import androidx.lifecycle.viewmodel.CreationExtras
-import androidx.lifecycle.viewmodel.MutableCreationExtras
+import androidx.compose.ui.Modifier
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import com.example.composeplay3.s002001_nav.SheetOne
@@ -30,9 +32,12 @@ class AppNavigationController(
 
     lateinit var activity: ComponentActivity
 
+    var tabBarVisible = true
+
     val navButtonsState = NavButtonsState(
+        tabBarActuallyVisible = tabBarVisible,
         gotoRoute = ::gotoRoute,
-        tabBarVisible = ::tabBarVisible
+        changeTabBarVisibility = ::changeTabBarVisibility
     )
 
     val destinations: PersistentSet<Destination> = persistentSetOf(
@@ -82,22 +87,56 @@ class AppNavigationController(
             isStartDestination = false,
             icon = androidx.core.R.drawable.ic_call_answer_video_low
         ) { backStackEntry ->
-            Log.d("gcompose", "NavHost ScreenSecondProduct")
 
+//            val viewModelStoreOwner = LocalViewModelStoreOwner.current
+//
+//            val extras = remember {
+//                when {
+//                    viewModelStoreOwner is HasDefaultViewModelProviderFactory -> viewModelStoreOwner.defaultViewModelCreationExtras
+//                    else -> CreationExtras.Empty
+//                }
+//            }
+
+            Log.d("gcompose", "NavHost ScreenSecondProduct")
             val viewModel: SecondProductViewModel = viewModel(
                 modelClass = SecondProductViewModel::class.java,
                 factory = SecondProductViewModelFactory(),
-                extras = MutableCreationExtras(initialExtras = activity.defaultViewModelCreationExtras).apply {
-                    backStackEntry.arguments?.let {
-                        set(
-                            DEFAULT_ARGS_KEY, it
-                        )
-                    }
-                }
+//                extras = extras
             )
 
+            LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+                viewModel.onResume()
+            }
+
+            LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) {
+                viewModel.onPause()
+            }
+
+            LifecycleEventEffect(Lifecycle.Event.ON_CREATE) {
+                viewModel.onCreate()
+            }
+
+//            LifecycleEventEffect(Lifecycle.Event.ON_DESTROY) {
+//                viewModel.onDestroy()
+//            }
+
+
+            LifecycleEventEffect(Lifecycle.Event.ON_START) {
+                viewModel.onStart()
+            }
+
+            LifecycleEventEffect(Lifecycle.Event.ON_STOP) {
+                viewModel.onStop()
+            }
+
+            val s = LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsState().value
+
             ScreenSecondProduct(
-                secondProductState = viewModel.secondProductStateFlow.collectAsState().value,
+                modifier = Modifier
+                    .fillMaxSize()
+//                    .systemBarsPadding()
+                ,
+                secondProductState = viewModel.secondProductStateFlow.collectAsState().value, //viewModel.secondProductStateFlow.collectAsState().value,
                 flyHeartAction = viewModel.flyHeartAction.collectAsState(null).value,
                 navButtonsState = navButtonsState
             )
@@ -136,7 +175,8 @@ class AppNavigationController(
         )
     }
 
-    fun tabBarVisible(visible: Boolean) {
+    fun changeTabBarVisibility(visible: Boolean) {
+        tabBarVisible = visible
         navEvents.tryEmit(
             NavEvent.TabBarVisibility(
                 visible = visible

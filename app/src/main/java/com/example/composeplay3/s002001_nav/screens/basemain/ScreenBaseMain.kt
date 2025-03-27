@@ -5,15 +5,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,14 +28,15 @@ import com.example.composeplay3.ui.theme.ComposePlay3Theme
 @Composable
 fun ScreenBaseMain(navButtonsState: NavButtonsState) {
 
-    Log.d("gcompose", "ScreenBaseMain")
+    Log.d("gcompose", "ScreenBaseMain navButtonsState=$navButtonsState")
 
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .systemBarsPadding()
-            .background(Color(0xFF8F98BB), RoundedCornerShape(16.dp))
+//            .fillMaxSize()
+//            .systemBarsPadding()
+            .background(Color(0xFF8F98BB), RoundedCornerShape(24.dp))
     ) {
+
         Text(
             modifier = Modifier
                 .wrapContentWidth()
@@ -46,15 +47,40 @@ fun ScreenBaseMain(navButtonsState: NavButtonsState) {
             )
         )
 
-        val scrollState = rememberScrollState()
-        Column(
+        Box(
             modifier = Modifier
-                .padding(top = 30.dp)
-                .verticalScroll(scrollState)
+                .systemBarsPadding()
+                .fillMaxSize()
         ) {
-            NavButtons(
-                navButtonsState = navButtonsState
-            )
+            val scrollState = rememberScrollState()
+            Column(
+                modifier = Modifier
+                    //.padding(top = 30.dp)
+//                .systemBarsPadding()
+                    .verticalScroll(scrollState)
+            ) {
+                NavButtons(
+                    navButtonsState = navButtonsState
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .width(50.dp)
+                    .height(150.dp)
+                    .background(color = Color.Blue)
+                    .align(Alignment.BottomEnd)
+            ) {
+            }
+            Box(
+                modifier = Modifier
+                    .width(50.dp)
+                    .height(150.dp)
+                    .background(color = Color.Blue)
+                    .align(Alignment.TopEnd)
+            ) {
+            }
+
         }
 
         Text(
@@ -66,8 +92,38 @@ fun ScreenBaseMain(navButtonsState: NavButtonsState) {
                 color = Color.Red
             )
         )
+
+        Box(
+            modifier = Modifier
+                .width(20.dp)
+                .height(20.dp)
+                .background(color = Color.Cyan)
+                .align(Alignment.BottomEnd)
+        ) {
+        }
+        Box(
+            modifier = Modifier
+                .width(20.dp)
+                .height(20.dp)
+                .background(color = Color.Cyan)
+                .align(Alignment.TopEnd)
+        ) {
+        }
+
+
+//        val mod = if (navButtonsState.tabBarActuallyVisible) {
+//            Modifier
+//                .fillMaxSize()
+//        } else {
+//            Modifier
+//                .systemBarsPadding()
+//                .fillMaxSize()
+//        }
+
+
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

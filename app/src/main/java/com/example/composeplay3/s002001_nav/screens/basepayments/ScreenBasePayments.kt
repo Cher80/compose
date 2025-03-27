@@ -33,7 +33,7 @@ fun ScreenBasePayments(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .systemBarsPadding()
+//            .systemBarsPadding()
             .background(Color(0xFF00CCFF), RoundedCornerShape(16.dp))
     ) {
         Text(

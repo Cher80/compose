@@ -33,7 +33,7 @@ fun ScreenBaseSettings(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .systemBarsPadding()
+//            .systemBarsPadding()
             .background(Color(0xFFD0B9D1), RoundedCornerShape(16.dp))
     ) {
         Text(

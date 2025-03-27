@@ -87,7 +87,7 @@ fun NavButtons(navButtonsState: NavButtonsState) {
         Row {
             Button(
                 onClick = {
-                    navButtonsState.tabBarVisible(false)
+                    navButtonsState.changeTabBarVisibility(false)
                 },
                 modifier = Modifier
                     .wrapContentWidth()
@@ -102,7 +102,7 @@ fun NavButtons(navButtonsState: NavButtonsState) {
 
             Button(
                 onClick = {
-                    navButtonsState.tabBarVisible(true)
+                    navButtonsState.changeTabBarVisibility(true)
                 },
                 modifier = Modifier
                     .wrapContentWidth()

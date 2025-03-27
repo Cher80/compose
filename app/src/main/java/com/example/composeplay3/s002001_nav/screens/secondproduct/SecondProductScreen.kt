@@ -7,16 +7,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -40,13 +37,13 @@ import kotlinx.collections.immutable.plus
 
 @Composable
 fun ScreenSecondProduct(
+    modifier: Modifier,
     secondProductState: SecondProductState?,
     flyHeartAction: Int?,
     navButtonsState: NavButtonsState
 ) {
-
-
     if (secondProductState == null) return
+
     var products by remember {
         mutableIntStateOf(1)
     }
@@ -83,70 +80,91 @@ fun ScreenSecondProduct(
         "ScreenSecondProduct flyHearts.value=${flyHearts} flyHeartAction=$flyHeartAction products=${products} productsCount=${secondProductState?.productsCount} userId=${secondProductState.userId} startScreen=${secondProductState?.startScreen}"
     )
 
-    Box(modifier = Modifier) {
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xFF64965C), RoundedCornerShape(16.dp))
+
+    Box(modifier = modifier
+        .fillMaxSize()
+        .background(Color(0xFF64965C), RoundedCornerShape(46.dp))
+    ) {
+
+        Box(modifier = modifier
+            .systemBarsPadding()
+            .fillMaxSize()
+            .background(Color(0xFF64965C), RoundedCornerShape(46.dp))
         ) {
 
-            Log.d("gcompose", "ScreenSecondProduct Column compose")
-            Text(
+            Column(
                 modifier = Modifier
-                    .wrapContentWidth()
-                    .padding(16.dp),
-                text = "ScreenSecondProduct productsRemember=${products} productsCountViewmodel=${secondProductState.productsCount} userId=${secondProductState.userId} startScreen=${secondProductState.startScreen}",
-                style = TextStyle(
-                    color = Color.Black
-                )
-            )
-
-            Button(
-                onClick = {
-                    products++
-                }) {
-                Text("Plus products")
-            }
-
-            Button(
-                onClick = secondProductState.productsCountPlus
+                    .fillMaxSize()
             ) {
-                Text("Plus products viewmodel")
-            }
 
-            Button(
-                onClick = secondProductState.flyHeart
-            ) {
-                Text("Fly heart")
-            }
-
-            NavButtons(
-                navButtonsState = navButtonsState
-            )
-        }
-
-        Box(
-            modifier = Modifier
-                .padding(bottom = 200.dp)
-                .width(330.dp)
-                .height(230.dp)
-                .background(Color.White)
-                .align(Alignment.BottomEnd)
-        ) {
-            Log.d("gcompose", "ScreenSecondProduct BOX compose")
-
-            for (i in 0 until flyHearts.size) {
-                val id = flyHearts.elementAt(i)
-                key(id) {
-                    ScreenSecondHeart(
-                        modifier = Modifier
-                            .align(Alignment.BottomStart)
-                            .width(64.dp)
-                            .height(64.dp),
-                        id = id,
-                        finished = finishedHeart
+                Log.d("gcompose", "ScreenSecondProduct Column compose")
+                Text(
+                    modifier = Modifier
+                        .wrapContentWidth(),
+                    text = "ScreenSecondProduct productsRemember=${products} productsCountViewmodel=${secondProductState.productsCount} userId=${secondProductState.userId} startScreen=${secondProductState.startScreen}",
+                    style = TextStyle(
+                        color = Color.Black
                     )
+                )
+
+                Button(
+                    onClick = {
+                        products++
+                    }) {
+                    Text("Plus products")
+                }
+
+                Button(
+                    onClick = secondProductState.productsCountPlus
+                ) {
+                    Text("Plus products viewmodel")
+                }
+
+                Button(
+                    onClick = secondProductState.flyHeart
+                ) {
+                    Text("Fly heart")
+                }
+
+                NavButtons(
+                    navButtonsState = navButtonsState
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .padding(bottom = 200.dp)
+                    .width(330.dp)
+                    .height(230.dp)
+                    .background(Color.White)
+                    .align(Alignment.BottomEnd)
+            ) {
+                Log.d("gcompose", "ScreenSecondProduct BOX compose")
+
+                for (i in 0 until flyHearts.size) {
+                    val id = flyHearts.elementAt(i)
+                    key(id) {
+                        ScreenSecondHeart(
+                            modifier = Modifier
+                                .align(Alignment.BottomStart)
+                                .width(64.dp)
+                                .height(64.dp),
+                            id = id,
+                            finished = finishedHeart
+                        )
+                    }
+                }
+            }
+
+            Box(
+                modifier = Modifier.width(130.dp).height(400.dp).background(color = Color.Red)
+                    .align(Alignment.BottomEnd)
+            ) {
+                Button(
+                    modifier = Modifier.align(Alignment.BottomStart),
+                    onClick = {}) {
+                    Text("Bottom")
                 }
             }
         }
@@ -158,6 +176,7 @@ fun ScreenSecondProduct(
 fun ScreenSecondProductPreview() {
     ComposePlay3Theme {
         ScreenSecondProduct(
+            modifier = Modifier,
             secondProductState = SecondProductState.TEST,
             flyHeartAction = null,
             navButtonsState = NavButtonsState.TEST,
