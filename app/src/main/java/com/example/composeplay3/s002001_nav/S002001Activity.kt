@@ -14,14 +14,11 @@ import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,11 +31,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.indirect.onIndirectTouchEvent
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -134,7 +129,7 @@ class MainActivity : ComponentActivity() {
 
 
     @SuppressLint("RestrictedApi", "StateFlowValueCalledInComposition")
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
     @Composable
     fun MainContent(
         navController: NavHostController,
@@ -159,7 +154,9 @@ class MainActivity : ComponentActivity() {
 //            val navBarHolder = createRef()
 
 
-            val bottomPadding: Dp by animateDpAsState(if (navScreenContext.tabBarVisible) 0.dp else 70.dp)
+//            val bottomPadding: Dp by animateDpAsState(if (navScreenContext.tabBarVisible && !WindowInsets.isImeVisible) 0.dp else 70.dp)
+//            val bottomAlpha: Float by animateFloatAsState(if (navScreenContext.tabBarVisible && !WindowInsets.isImeVisible) 1f else 0f)
+            val bottomPadding: Dp by animateDpAsState(if (navScreenContext.tabBarVisible) 0.dp else navScreenContext.tabBarHeight)
             val bottomAlpha: Float by animateFloatAsState(if (navScreenContext.tabBarVisible) 1f else 0f)
 
             val constraintSetVisibleTabBar = ConstraintSet {

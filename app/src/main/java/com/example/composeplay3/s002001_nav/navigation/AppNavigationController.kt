@@ -87,6 +87,7 @@ class AppNavigationController(
         ) { backStackEntry ->
             Log.d("gcompose", "NavHost ScreenBaseSettings")
             ScreenBaseSettings(
+                navScreenContext = navScreenContext.value,
                 navButtonsState = provideNavButtonsState()
             )
         },

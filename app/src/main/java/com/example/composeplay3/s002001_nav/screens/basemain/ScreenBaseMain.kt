@@ -1,7 +1,6 @@
 package com.example.composeplay3.s002001_nav.screens.basemain
 
 import android.util.Log
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,15 +15,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.composeplay3.s002001_nav.navigation.NavScreenContext
+import com.example.composeplay3.s002001_nav.navigation.getTabBarPaddingWithImeState
 import com.example.composeplay3.s002001_nav.ui.nav.NavButtons
 import com.example.composeplay3.s002001_nav.ui.nav.NavButtonsState
 import com.example.composeplay3.ui.theme.ComposePlay3Theme
@@ -34,11 +32,8 @@ import com.example.composeplay3.ui.theme.ComposePlay3Theme
 fun ScreenBaseMain(navScreenContext: NavScreenContext, navButtonsState: NavButtonsState) {
 
     Log.d("gcompose", "ScreenBaseMain navButtonsState=$navButtonsState")
-    val bottomPadding: Dp by animateDpAsState(if (navScreenContext.tabBarVisible) navScreenContext.tabBarHeight else 0.dp)
     Box(
         modifier = Modifier
-//            .fillMaxSize()
-//            .systemBarsPadding()
             .background(Color(0xFF8F98BB), RoundedCornerShape(24.dp))
     ) {
 
@@ -56,13 +51,11 @@ fun ScreenBaseMain(navScreenContext: NavScreenContext, navButtonsState: NavButto
             modifier = Modifier
                 .systemBarsPadding()
                 .fillMaxSize()
-                .padding(bottom = bottomPadding)
+                .padding(bottom = navScreenContext.getTabBarPaddingWithImeState().value)
         ) {
             val scrollState = rememberScrollState()
             Column(
                 modifier = Modifier
-                    //.padding(top = 30.dp)
-//                .systemBarsPadding()
                     .verticalScroll(scrollState)
             ) {
                 NavButtons(
@@ -86,25 +79,6 @@ fun ScreenBaseMain(navScreenContext: NavScreenContext, navButtonsState: NavButto
                     .align(Alignment.TopEnd)
             ) {
             }
-
-//            AnimatedVisibility(
-//                    visible = true,
-//                    enter = slideInVertically(
-//                        initialOffsetY = {
-//                            it
-//                        }
-//                    ),
-//                    exit = slideOutVertically(
-//                        targetOffsetY = {
-//                            it
-//                        }
-//                    ),
-//                    modifier = Modifier
-//                ) {
-//                Spacer(modifier = Modifier.height(70.dp))
-//            }
-
-
         }
 
         Text(
@@ -133,18 +107,6 @@ fun ScreenBaseMain(navScreenContext: NavScreenContext, navButtonsState: NavButto
                 .align(Alignment.TopEnd)
         ) {
         }
-
-
-//        val mod = if (navButtonsState.tabBarActuallyVisible) {
-//            Modifier
-//                .fillMaxSize()
-//        } else {
-//            Modifier
-//                .systemBarsPadding()
-//                .fillMaxSize()
-//        }
-
-
     }
 }
 
