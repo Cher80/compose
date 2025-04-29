@@ -1,6 +1,7 @@
 package com.example.composeplay3.s002001_nav.screens.secondproduct
 
 import android.util.Log
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,7 +27,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.composeplay3.s002001_nav.navigation.NavScreenContext
 import com.example.composeplay3.s002001_nav.ui.nav.NavButtons
 import com.example.composeplay3.s002001_nav.ui.nav.NavButtonsState
 import com.example.composeplay3.ui.theme.ComposePlay3Theme
@@ -40,9 +43,12 @@ fun ScreenSecondProduct(
     modifier: Modifier,
     secondProductState: SecondProductState?,
     flyHeartAction: Int?,
+    navScreenContext: NavScreenContext,
     navButtonsState: NavButtonsState
 ) {
     if (secondProductState == null) return
+
+    val bottomPadding: Dp by animateDpAsState(if (navScreenContext.tabBarVisible) navScreenContext.tabBarHeight else 0.dp)
 
     var products by remember {
         mutableIntStateOf(1)
@@ -91,6 +97,7 @@ fun ScreenSecondProduct(
             .systemBarsPadding()
             .fillMaxSize()
             .background(Color(0xFF64965C), RoundedCornerShape(46.dp))
+            .padding(bottom = bottomPadding)
         ) {
 
             Column(
@@ -134,7 +141,6 @@ fun ScreenSecondProduct(
 
             Box(
                 modifier = Modifier
-                    .padding(bottom = 200.dp)
                     .width(330.dp)
                     .height(230.dp)
                     .background(Color.White)
@@ -157,16 +163,16 @@ fun ScreenSecondProduct(
                 }
             }
 
-            Box(
-                modifier = Modifier.width(130.dp).height(400.dp).background(color = Color.Red)
-                    .align(Alignment.BottomEnd)
-            ) {
-                Button(
-                    modifier = Modifier.align(Alignment.BottomStart),
-                    onClick = {}) {
-                    Text("Bottom")
-                }
-            }
+//            Box(
+//                modifier = Modifier.width(130.dp).height(400.dp).background(color = Color.Red)
+//                    .align(Alignment.BottomEnd)
+//            ) {
+//                Button(
+//                    modifier = Modifier.align(Alignment.BottomStart),
+//                    onClick = {}) {
+//                    Text("Bottom")
+//                }
+//            }
         }
     }
 }
@@ -179,6 +185,7 @@ fun ScreenSecondProductPreview() {
             modifier = Modifier,
             secondProductState = SecondProductState.TEST,
             flyHeartAction = null,
+            navScreenContext = NavScreenContext.TEST,
             navButtonsState = NavButtonsState.TEST,
         )
     }

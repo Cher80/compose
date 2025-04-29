@@ -7,6 +7,7 @@ import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
@@ -32,13 +33,21 @@ class AppNavigationController(
 
     lateinit var activity: ComponentActivity
 
-    var tabBarVisible = true
 
-    val navButtonsState = NavButtonsState(
-        tabBarActuallyVisible = tabBarVisible,
-        gotoRoute = ::gotoRoute,
-        changeTabBarVisibility = ::changeTabBarVisibility
+    //private var tabBarVisible = true
+    var navScreenContext = mutableStateOf(
+        NavScreenContext(
+            tabBarVisible = true
+        )
     )
+
+    fun provideNavButtonsState(): NavButtonsState {
+        return NavButtonsState(
+            gotoRoute = ::gotoRoute,
+            changeTabBarVisibility = ::changeTabBarVisibility
+        )
+    }
+
 
     val destinations: PersistentSet<Destination> = persistentSetOf(
         Destination(
@@ -50,7 +59,8 @@ class AppNavigationController(
         ) { backStackEntry ->
             Log.d("gcompose", "NavHost ScreenBaseMain")
             ScreenBaseMain(
-                navButtonsState = navButtonsState
+                navScreenContext = navScreenContext.value,
+                navButtonsState = provideNavButtonsState()
             )
         },
 
@@ -63,7 +73,8 @@ class AppNavigationController(
         ) { backStackEntry ->
             Log.d("gcompose", "NavHost ScreenBasePayments")
             ScreenBasePayments(
-                navButtonsState = navButtonsState
+                navScreenContext = navScreenContext.value,
+                navButtonsState = provideNavButtonsState()
             )
         },
 
@@ -76,7 +87,7 @@ class AppNavigationController(
         ) { backStackEntry ->
             Log.d("gcompose", "NavHost ScreenBaseSettings")
             ScreenBaseSettings(
-                navButtonsState = navButtonsState
+                navButtonsState = provideNavButtonsState()
             )
         },
 
@@ -138,7 +149,8 @@ class AppNavigationController(
                 ,
                 secondProductState = viewModel.secondProductStateFlow.collectAsState().value, //viewModel.secondProductStateFlow.collectAsState().value,
                 flyHeartAction = viewModel.flyHeartAction.collectAsState(null).value,
-                navButtonsState = navButtonsState
+                navScreenContext = navScreenContext.value,
+                navButtonsState = provideNavButtonsState()
             )
         },
 
@@ -176,11 +188,8 @@ class AppNavigationController(
     }
 
     fun changeTabBarVisibility(visible: Boolean) {
-        tabBarVisible = visible
-        navEvents.tryEmit(
-            NavEvent.TabBarVisibility(
-                visible = visible
-            )
+        navScreenContext.value = navScreenContext.value.copy(
+            tabBarVisible = visible
         )
     }
 

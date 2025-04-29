@@ -11,20 +11,19 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.layout.waterfall
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -35,40 +34,39 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.indirect.onIndirectTouchEvent
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.layoutId
-import androidx.core.graphics.Insets
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.composeplay3.s002001_nav.base.NONE_WINDOW_INSETS
 import com.example.composeplay3.s002001_nav.navigation.AppNavigationController
 import com.example.composeplay3.s002001_nav.navigation.NavEvent
+import com.example.composeplay3.s002001_nav.navigation.NavScreenContext
 import com.example.composeplay3.ui.theme.ComposePlay3Theme
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.PersistentSet
 
 class MainActivity : ComponentActivity() {
 
-    var tabBarVisibility: Boolean = true
-
-
     var mainContentsStateMutable = mutableStateOf<MainContentsState?>(null)
     val appNavigationController = AppNavigationController().apply {
         activity = this@MainActivity
     }
 
+    @OptIn(ExperimentalLayoutApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -108,8 +106,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                         is NavEvent.TabBarVisibility -> {
-                            tabBarVisibility = navEvent.visible
-                            handleState()
+//                            handleState()
                         }
 
                         is NavEvent.NO -> {}
@@ -117,9 +114,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
+            //appNavigationController.changeImeVisibility(WindowInsets.isImeVisible)
             MainContent(
                 navController = navController,
-                mainContentsState = mainContentsStateMutable
+                mainContentsState = mainContentsStateMutable,
+                navScreenContext = appNavigationController.navScreenContext.value
             )
         }
     }
@@ -129,7 +128,6 @@ class MainActivity : ComponentActivity() {
         Log.d("asadff", "handleState")
         mainContentsStateMutable.value = MainContentsState(
             destinations = appNavigationController.destinations,
-            tabBarVisibility = tabBarVisibility,
             gotoRoute = appNavigationController::gotoRoute
         )
     }
@@ -140,11 +138,12 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun MainContent(
         navController: NavHostController,
+        navScreenContext: NavScreenContext,
         mainContentsState: MutableState<MainContentsState?>
     ) {
         Log.d(
             "gcompose",
-            "MainContent tabBarVisibility=${mainContentsState.value?.tabBarVisibility}"
+            "MainContent tabBarVisibility=${navScreenContext.tabBarVisible}"
         )
         val mainContentsStateValue = mainContentsState.value ?: return
         Log.d("gcompose", "MainContent DO")
@@ -160,83 +159,47 @@ class MainActivity : ComponentActivity() {
 //            val navBarHolder = createRef()
 
 
-            val constraintSetVisibleTabBar = if (mainContentsStateValue.tabBarVisibility) {
-                ConstraintSet {
-                    val navHost = createRefFor("navHost")
-                    val navBarHolder = createRefFor("navBarHolder")
-                    val bottomBox = createRefFor("bottomBox")
-                    val topBox = createRefFor("topBox")
+            val bottomPadding: Dp by animateDpAsState(if (navScreenContext.tabBarVisible) 0.dp else 70.dp)
+            val bottomAlpha: Float by animateFloatAsState(if (navScreenContext.tabBarVisible) 1f else 0f)
 
-                    constrain(navHost) {
-                        width = Dimension.fillToConstraints
-                        height = Dimension.fillToConstraints
-                        top.linkTo(parent.top)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                        bottom.linkTo(
-                            anchor = parent.bottom,
-                            margin = 80.dp
-                        )
-                    }
+            val constraintSetVisibleTabBar = ConstraintSet {
+                val navHost = createRefFor("navHost")
+                val navBarHolder = createRefFor("navBarHolder")
+                val bottomBox = createRefFor("bottomBox")
+                val topBox = createRefFor("topBox")
 
-                    constrain(navBarHolder) {
-                        width = Dimension.fillToConstraints
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                        bottom.linkTo(parent.bottom)
-                    }
-
-                    constrain(bottomBox) {
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                        bottom.linkTo(navHost.bottom)
-                    }
-
-                    constrain(topBox) {
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                        top.linkTo(navHost.top)
-                    }
+                constrain(navHost) {
+                    width = Dimension.fillToConstraints
+                    height = Dimension.fillToConstraints
+                    top.linkTo(parent.top)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    bottom.linkTo(
+                        anchor = parent.bottom,
+                        margin = 0.dp // 80.dp
+                    )
                 }
-            } else {
-                ConstraintSet {
-                    val navHost = createRefFor("navHost")
-                    val navBarHolder = createRefFor("navBarHolder")
-                    val bottomBox = createRefFor("bottomBox")
-                    val topBox = createRefFor("topBox")
 
-                    constrain(navHost) {
-                        width = Dimension.fillToConstraints
-                        height = Dimension.fillToConstraints
-                        top.linkTo(parent.top)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                        bottom.linkTo(
-                            anchor = parent.bottom,
-                            margin = 0.dp
-                        )
-                    }
+                constrain(navBarHolder) {
+                    width = Dimension.fillToConstraints
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    bottom.linkTo(parent.bottom)
+                }
 
-                    constrain(navBarHolder) {
-                        width = Dimension.fillToConstraints
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                        top.linkTo(parent.bottom)
-                    }
+                constrain(bottomBox) {
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    bottom.linkTo(navHost.bottom)
+                }
 
-                    constrain(bottomBox) {
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                        bottom.linkTo(navHost.bottom)
-                    }
-
-                    constrain(topBox) {
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                        top.linkTo(navHost.top)
-                    }
+                constrain(topBox) {
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    top.linkTo(navHost.top)
                 }
             }
+
 
 
 
@@ -328,53 +291,60 @@ class MainActivity : ComponentActivity() {
 ////                            end.linkTo(parent.end)
 ////                        }
 //                ) {
-                NavigationBar(
+                if (bottomAlpha != 0f) {
+                    NavigationBar(
 //                    windowInsets = NONE_WINDOW_INSETS,
-                    modifier = Modifier
-                        .systemBarsPadding()
-                        .height(80.dp)
-                        .layoutId("navBarHolder"),
-                    contentColor = Color.Black
-                ) {
-                    Log.d("gcompose", "NavigationBar")
+                        modifier = Modifier
+                            .systemBarsPadding()
+                            .height(navScreenContext.tabBarHeight)
+                            .layoutId("navBarHolder")
+                            .graphicsLayer {
+                                translationY = bottomPadding.toPx()
+                                alpha = bottomAlpha
+                            },
 
-                    // recompose на изменение стека !! не убирать
-                    val navBackStackEntry by navController.currentBackStackEntryAsState()
-                    val currentDestination = navBackStackEntry?.destination
-                    Log.d("gcompose", "NavigationBar currentDestination = $currentDestination")
+                        contentColor = Color.Black,
+                    ) {
+                        Log.d("gcompose", "NavigationBar")
 
-                    val startRoute =
-                        mainContentsStateValue.destinations.first { it.isStartDestination }.route
-                    val backEnabled =
-                        mainContentsStateValue.destinations.filter { it.isTab }.any {
-                            it.route == navController.currentDestination?.route &&
-                                    navController.currentDestination?.route != startRoute
-                        }
-                    BackHandler(enabled = backEnabled) {
-                        Log.d("gcompose", "BackHandler")
-                        mainContentsStateValue.gotoRoute(startRoute)
-                    }
+                        // recompose на изменение стека !! не убирать
+                        val navBackStackEntry by navController.currentBackStackEntryAsState()
+                        val currentDestination = navBackStackEntry?.destination
+                        Log.d("gcompose", "NavigationBar currentDestination = $currentDestination")
 
-                    mainContentsStateValue.destinations.filter { it.isTab }
-                        .forEachIndexed { index, tabDestination ->
-                            val selected = navController.currentBackStack.value.any {
-                                it.destination.route == tabDestination.route
+                        val startRoute =
+                            mainContentsStateValue.destinations.first { it.isStartDestination }.route
+                        val backEnabled =
+                            mainContentsStateValue.destinations.filter { it.isTab }.any {
+                                it.route == navController.currentDestination?.route &&
+                                        navController.currentDestination?.route != startRoute
                             }
-
-                            NavigationBarItem(
-                                icon = {
-                                    Icon(
-                                        painterResource(id = tabDestination.icon!!),
-                                        null
-                                    )
-                                },
-                                label = { Text(text = tabDestination.title) },
-                                selected = selected,
-                                onClick = {
-                                    mainContentsStateValue.gotoRoute(tabDestination.route)
-                                }
-                            )
+                        BackHandler(enabled = backEnabled) {
+                            Log.d("gcompose", "BackHandler")
+                            mainContentsStateValue.gotoRoute(startRoute)
                         }
+
+                        mainContentsStateValue.destinations.filter { it.isTab }
+                            .forEachIndexed { index, tabDestination ->
+                                val selected = navController.currentBackStack.value.any {
+                                    it.destination.route == tabDestination.route
+                                }
+
+                                NavigationBarItem(
+                                    icon = {
+                                        Icon(
+                                            painterResource(id = tabDestination.icon!!),
+                                            null
+                                        )
+                                    },
+                                    label = { Text(text = tabDestination.title) },
+                                    selected = selected,
+                                    onClick = {
+                                        mainContentsStateValue.gotoRoute(tabDestination.route)
+                                    }
+                                )
+                            }
+                    }
                 }
 
 //                }
@@ -449,6 +419,5 @@ fun NavController?.bottomNavigatonClick(
 
 data class MainContentsState(
     val destinations: ImmutableSet<AppNavigationController.Destination>,
-    val tabBarVisibility: Boolean,
     val gotoRoute: (String) -> Unit
 )

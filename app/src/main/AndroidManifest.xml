@@ -23,6 +23,7 @@
             android:name=".s002001_nav.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.Composeplay3">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
